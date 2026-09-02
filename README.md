@@ -31,6 +31,19 @@ editor without touching code.
 Shopify's own secure checkout. Also collection pages, search, a cart page,
 customer accounts, a gift-card page, a 404 and a password page.
 
+## Your products are in the box
+
+`products-import.csv` holds all 52 products from the links you sent - names,
+descriptions, three benefit bullets each, categories and 54 supplier photos.
+One import creates the lot.
+
+The price column is blank on 51 of them, on purpose. TikTok Shop puts the
+price behind a captcha, and the selling price is your margin decision rather
+than a number to copy. Fill that column in before importing - a blank price
+imports as $0.00, which looks like a working price.
+
+See `SETUP.md` step 4.
+
 ## Product content is optional
 
 The landing page is built so a product with **nothing but a title, a price, a

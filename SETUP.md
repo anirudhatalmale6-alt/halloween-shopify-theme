@@ -41,49 +41,87 @@ place and the whole store follows.
 
 ## 4. Add your products
 
-### The quick way — import a spreadsheet
+All 52 of your products are already in `products-import.csv`, with names,
+descriptions, benefit bullets, categories and photos.
 
-1. Open `products-import.csv`.
-2. Fill in a row per product. The columns that matter:
+### Before you import: set your prices
 
-   | Column | What goes in it |
-   |---|---|
-   | `Handle` | short name, lowercase with hyphens — becomes the page address |
-   | `Title` | the product name shoppers see |
-   | `Body (HTML)` | the description. Plain sentences are fine |
-   | `Type` | Decor, Costumes, Lighting, Party — used for the category tiles |
-   | `Tags` | `badge:Best seller` puts that label on the product card |
-   | `Variant Price` | your selling price, e.g. `24.99` |
-   | `Variant Compare At Price` | the "was" price — this is what creates the crossed-out price and the discount badge |
-   | `Image Src` | a full web address to the photo |
+The price column is blank on 51 of the 52. TikTok Shop puts the price behind a
+captcha so I could not read it, and your selling price is your margin decision
+anyway. Only the SplatMat has a price, because its own store publishes one.
 
-3. In Shopify: **Products → Import → Add file**, choose your CSV, **Upload and
-   continue**.
+Open `products-import.csv` and fill in two columns:
 
-You can import in batches. Do ten, look at the store, then do the rest.
+| Column | What goes in it |
+|---|---|
+| `Variant Price` | what you are selling it for, e.g. `24.99` |
+| `Variant Compare At Price` | the "was" price. This is what creates the crossed-out price and the discount badge. Leave it blank if you do not want one. |
 
-### Adding more photos
+Leave a price blank and Shopify imports that product at **$0.00**, which looks
+like a working price. Fill them in first.
+
+### Import it
+
+**Products → Import → Add file**, choose `products-import.csv`, then **Upload
+and continue**.
+
+Shopify downloads each photo during the import and copies it onto its own CDN,
+so the images become yours - they do not stay linked to anywhere else.
+
+You can split the file and import in batches. Do ten, look at the store, then
+do the rest.
+
+### One product has no photo
+
+`scary-face-headrest-covers` - the Walmart headrest covers. Walmart blocks
+automated requests to that page, so I have the name from the link and nothing
+else. Add a photo and a price by hand after the import.
+
+### Two possible duplicates
+
+These two pairs looked close enough that they may be the same item listed
+twice. Both are in the file; delete a row if you agree they are duplicates.
+
+- `halloween-tree-lights-black` and `halloween-tree-lights-24led`
+- `skeleton-cardigan-black` and `skeleton-cardigan-colours`
+
+### Adding more photos later
 
 One row per extra photo: repeat the `Handle`, leave everything else blank, and
 put the next photo in `Image Src` with `Image Position` 2, 3, 4 and so on.
-Three photos per product is where the gallery looks best.
+Three photos per product is where the gallery looks best - most of yours
+currently have one, because that is all the supplier listing carried.
 
 ### Products with sizes or colours
 
-Fill `Option1 Name` with `Size` and add one row per size, repeating the
-`Handle` and changing `Option1 Value` and `Variant Price`. The size buttons
-appear on the product page automatically.
+`products-template.csv` shows the pattern. Fill `Option1 Name` with `Size` and
+add one row per size, repeating the `Handle` and changing `Option1 Value` and
+`Variant Price`. The size buttons appear on the product page automatically.
+
+Several of yours will need this - the cardigans, the sweaters, the overalls and
+the slippers all come in sizes, and the phone cases come in models.
 
 ---
 
 ## 5. Collections
 
 **Products → Collections → Create collection.** Set it to **Automated** and add
-a condition like *Product type is equal to Decor*. Every matching product joins
-on its own, including ones you import later.
+the condition *Product type is equal to ...*.
 
-Make one per category, then point the four category tiles at them in the theme
-editor.
+The import already sets the product type on every row, so make one collection
+per type and they fill themselves:
+
+| Collection | Condition | Products |
+|---|---|---|
+| LED Masks | Product type is equal to `LED Masks` | 6 |
+| Lights & Candles | Product type is equal to `Lights & Candles` | 12 |
+| Yard & Outdoor | Product type is equal to `Yard & Outdoor` | 8 |
+| Home & Decor | Product type is equal to `Home & Decor` | 15 |
+| Apparel | Product type is equal to `Apparel` | 7 |
+| Accessories | Product type is equal to `Accessories` | 4 |
+
+Anything you import later joins on its own, as long as you set the same type.
+Then point the category tiles at them in the theme editor.
 
 ---
 
@@ -134,7 +172,20 @@ hand. Set this up before you start advertising.
 
 ---
 
-## 9. Go live
+## 9. Before you go live: the four hero masks
+
+Four of the LED masks are Marvel character products - Spider-Man and
+Spider-Gwen. I have named them descriptively in the import file rather than
+using the character names.
+
+Keep it that way. Selling the item is between you and your supplier, but
+putting a trademarked character name in your own product title, description or
+ads is what makes it your problem - it is one of the quicker routes to a
+Shopify suspension or a frozen payout.
+
+---
+
+## 10. Go live
 
 **Online Store → Preferences**, remove the password. Do these first:
 
