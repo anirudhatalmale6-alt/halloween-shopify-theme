@@ -1,0 +1,72 @@
+<section class="trust">
+  <div class="wrap trust__in">
+    {%- for block in section.blocks -%}
+      <div class="trust__i" {{ block.shopify_attributes }}>
+        <b>{{ block.settings.title | escape }}</b>
+        <span>{{ block.settings.text | escape }}</span>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Trust bar",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free shipping"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "On every US order"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust bar",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "title": "Free shipping",
+            "text": "On every US order"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "Ships in 24h",
+            "text": "Order today, out tomorrow"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "30-day returns",
+            "text": "Changed your mind? Fine."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "Secure checkout",
+            "text": "Encrypted, every time"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

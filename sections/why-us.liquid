@@ -1,0 +1,135 @@
+<section class="sec" id="{{ section.settings.anchor | default: 'why' }}">
+  <div class="wrap why">
+    <div class="why__txt">
+      {%- if section.settings.kicker != blank -%}
+        <p class="sec__k">{{ section.settings.kicker | escape }}</p>
+      {%- endif -%}
+      <h2 class="sec__h">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p>{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+
+      <ul class="ticks">
+        {%- for block in section.blocks -%}
+          <li {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</li>
+        {%- endfor -%}
+      </ul>
+
+      {%- if section.settings.btn_text != blank -%}
+        <a class="btn btn--gold" href="{{ section.settings.btn_link | default: routes.all_products_collection_url }}">
+          {{ section.settings.btn_text | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="why__art">
+      {%- if section.settings.image != blank -%}
+        {%- comment -%}
+          width/height attributes prevent layout shift; the stylesheet must then
+          carry height:auto or the attribute height wins and the picture renders
+          stretched. That bug shipped once already.
+        {%- endcomment -%}
+        <img src="{{ section.settings.image | image_url: width: 800 }}"
+             alt="{{ section.settings.heading | escape }}"
+             width="{{ section.settings.image.width }}"
+             height="{{ section.settings.image.height }}" loading="lazy">
+      {%- else -%}
+        {{ 'product-2' | placeholder_svg_tag: 'why__ph' }}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Why us",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Small line above the heading",
+      "default": "Why us"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Halloween, done properly"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Anyone can sell a plastic pumpkin. We pick pieces that hold up on the night and look like you meant it."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text",
+      "default": "Start shopping"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id (for menu links)",
+      "default": "why"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Free shipping on every US order"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Why us",
+      "blocks": [
+        {
+          "type": "point",
+          "settings": {
+            "text": "Free shipping on every US order, no minimum"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "Everything ships within 24 hours"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "Ordered before October 24th? It arrives in time"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "30-day returns, no interrogation"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

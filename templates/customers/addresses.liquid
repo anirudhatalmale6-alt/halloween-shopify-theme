@@ -1,0 +1,43 @@
+<section class="sec sec--top">
+  <div class="wrap wrap--narrow">
+    <h1 class="sec__h">{{ 'customer.addresses.title' | t }}</h1>
+    <p class="sec__sub"><a class="lnk" href="{{ routes.account_url }}">{{ 'customer.account.return' | t }}</a></p>
+
+    {%- paginate customer.addresses by 10 -%}
+      {%- for address in customer.addresses -%}
+        <div class="addr">
+          {{ address | format_address }}
+          <form method="post" action="/account/addresses/{{ address.id }}">
+            <input type="hidden" name="_method" value="delete">
+            <button class="btn btn--ghost" type="submit"
+                    onclick="return confirm('{{ 'customer.addresses.delete_confirm' | t }}')">
+              {{ 'customer.addresses.delete' | t }}
+            </button>
+          </form>
+        </div>
+      {%- else -%}
+        <p class="sec__empty">No addresses saved yet.</p>
+      {%- endfor -%}
+    {%- endpaginate -%}
+
+    <h2 class="sec__h">{{ 'customer.addresses.add_new' | t }}</h2>
+    {%- form 'customer_address', customer.new_address -%}
+      {{ form.errors | default_errors }}
+      <div class="fld"><label for="a-fn">{{ 'customer.addresses.first_name' | t }}</label>
+        <input type="text" id="a-fn" name="address[first_name]" autocomplete="given-name"></div>
+      <div class="fld"><label for="a-ln">{{ 'customer.addresses.last_name' | t }}</label>
+        <input type="text" id="a-ln" name="address[last_name]" autocomplete="family-name"></div>
+      <div class="fld"><label for="a-a1">{{ 'customer.addresses.address1' | t }}</label>
+        <input type="text" id="a-a1" name="address[address1]" autocomplete="address-line1"></div>
+      <div class="fld"><label for="a-a2">{{ 'customer.addresses.address2' | t }}</label>
+        <input type="text" id="a-a2" name="address[address2]" autocomplete="address-line2"></div>
+      <div class="fld"><label for="a-ct">{{ 'customer.addresses.city' | t }}</label>
+        <input type="text" id="a-ct" name="address[city]" autocomplete="address-level2"></div>
+      <div class="fld"><label for="a-zp">{{ 'customer.addresses.zip' | t }}</label>
+        <input type="text" id="a-zp" name="address[zip]" autocomplete="postal-code"></div>
+      <div class="fld"><label for="a-ph">{{ 'customer.addresses.phone' | t }}</label>
+        <input type="tel" id="a-ph" name="address[phone]" autocomplete="tel"></div>
+      <button class="btn btn--gold" type="submit">{{ 'customer.addresses.save' | t }}</button>
+    {%- endform -%}
+  </div>
+</section>

@@ -1,0 +1,35 @@
+<section class="sec sec--top">
+  <div class="wrap">
+    <h1 class="sec__h">{{ blog.title }}</h1>
+    {%- paginate blog.articles by 12 -%}
+      <div class="revs">
+        {%- for article in blog.articles -%}
+          <article class="rev rv">
+            {%- if article.image -%}
+              <a href="{{ article.url }}">
+                <img src="{{ article.image | image_url: width: 600 }}" alt="{{ article.image.alt | escape }}"
+                     width="600" height="400" loading="lazy" class="art__img">
+              </a>
+            {%- endif -%}
+            <h2 class="card__name"><a href="{{ article.url }}">{{ article.title }}</a></h2>
+            <p class="card__blurb">{{ article.excerpt_or_content | strip_html | truncatewords: 24 }}</p>
+            <figcaption><span>{{ article.published_at | date: '%B %-d, %Y' }}</span></figcaption>
+          </article>
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}
+        <nav class="pager" aria-label="Pagination">
+          {%- if paginate.previous -%}<a class="btn btn--ghost" href="{{ paginate.previous.url }}">Previous</a>{%- endif -%}
+          <span class="pager__n">Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+          {%- if paginate.next -%}<a class="btn btn--ghost" href="{{ paginate.next.url }}">Next</a>{%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Blog"
+}
+{% endschema %}

@@ -1,0 +1,44 @@
+<section class="sec sec--top">
+  <div class="wrap wrap--narrow">
+    <h1 class="sec__h">Your cart</h1>
+
+    {%- if cart.item_count == 0 -%}
+      <p class="sec__empty">Your cart is empty.</p>
+      <p class="cartpg__cta">
+        <a class="btn btn--gold" href="{{ routes.all_products_collection_url }}">Start shopping</a>
+      </p>
+    {%- else -%}
+      <form action="{{ routes.cart_url }}" method="post" novalidate class="cartpg">
+        {%- comment -%}
+          These two ids matter. The quantity and remove controls are handled by
+          one delegated listener that re-renders from the server, and without a
+          handle on the page's own list it would refresh the drawer while the
+          page the shopper is actually looking at sat there unchanged - buttons
+          that appear to do nothing.
+        {%- endcomment -%}
+        <div class="cartpg__items" id="cartpg-items">
+          {% render 'cart-items', cart: cart %}
+        </div>
+
+        <div class="cartpg__ft">
+          <div class="cart__row">
+            <span>Subtotal</span>
+            <b id="cartpg-sub">{{ cart.total_price | money }}</b>
+          </div>
+          <div class="cart__row cart__row--ship">
+            <span>Shipping</span>
+            <b>{{ settings.free_shipping_text }}</b>
+          </div>
+          <p class="cart__note">Taxes and any shipping options are worked out at checkout.</p>
+          <button type="submit" name="checkout" class="btn btn--gold btn--wide">Checkout</button>
+        </div>
+      </form>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Cart"
+}
+{% endschema %}

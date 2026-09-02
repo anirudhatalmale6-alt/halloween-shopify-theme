@@ -1,0 +1,42 @@
+{%- if section.settings.show -%}
+  <div class="ann" role="region" aria-label="Announcement">
+    <p>
+      {%- comment -%}
+        The &nbsp; is load-bearing. The whitespace-stripping tags either side
+        eat a normal space, which ran the two halves together as
+        "FREE US SHIPPINGON EVERY ORDER". An entity is not whitespace, so it
+        survives the strip.
+      {%- endcomment -%}
+      {%- if section.settings.strong != blank -%}
+        <strong>{{ section.settings.strong | escape }}</strong>&nbsp;
+      {%- endif -%}
+      {{ section.settings.text | escape }}
+    </p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show",
+      "label": "Show the announcement bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "strong",
+      "label": "Highlighted words",
+      "default": "Free US shipping"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Message",
+      "default": "on every order &middot; Delivered before October 31st"
+    }
+  ]
+}
+{% endschema %}

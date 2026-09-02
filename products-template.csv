@@ -1,0 +1,8 @@
+Handle,Title,Body (HTML),Vendor,Type,Tags,Published,Option1 Name,Option1 Value,Variant SKU,Variant Inventory Tracker,Variant Inventory Qty,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Compare At Price,Variant Requires Shipping,Variant Taxable,Image Src,Image Position,Image Alt Text,SEO Title,SEO Description,Status
+example-simple-product,EXAMPLE - a plain product,<p>One paragraph is enough. The landing page turns the first few sentences into the bullet list on its own when you have not written bullets yourself.</p>,,Decor,badge:Best seller,TRUE,Title,Default Title,EX-001,shopify,25,deny,manual,24.99,34.99,TRUE,TRUE,https://example.com/your-photo.jpg,1,Describe the photo here for Google and screen readers,Example product | Your Store,A short sentence that shows up under the link in Google results.,active
+example-simple-product,,,,,,,,,,,,,,,,,,https://example.com/your-photo-2.jpg,2,Second angle,,,
+example-simple-product,,,,,,,,,,,,,,,,,,https://example.com/your-photo-3.jpg,3,In use,,,
+example-product-with-sizes,EXAMPLE - a product with sizes,<p>The size buttons on the product page come from these rows.</p>,,Costumes,,TRUE,Size,S,EX-S,shopify,15,deny,manual,34.99,49.99,TRUE,TRUE,https://example.com/costume.jpg,1,The costume,,,active
+example-product-with-sizes,,,,,,,,M,EX-M,shopify,20,deny,manual,34.99,49.99,TRUE,TRUE,,,,,,
+example-product-with-sizes,,,,,,,,L,EX-L,shopify,20,deny,manual,34.99,49.99,TRUE,TRUE,,,,,,
+example-product-with-sizes,,,,,,,,XL,EX-XL,shopify,8,deny,manual,37.99,49.99,TRUE,TRUE,,,,,,

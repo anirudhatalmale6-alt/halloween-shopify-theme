@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.color_bg }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 48 }}">
+  {%- endif -%}
+
+  <title>
+    {{ page_title }}
+    {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+    {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+
+  {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  {% render 'font-face' %}
+
+  {{ content_for_header }}
+
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+
+  {%- comment -%}
+    Every colour in the stylesheet reads from a variable. Re-declaring them here
+    from theme settings is what lets the shop owner recolour the whole store from
+    the customizer without anyone touching CSS.
+  {%- endcomment -%}
+  <style>
+    :root{
+      --bg:{{ settings.color_bg }};
+      --bg2:{{ settings.color_bg2 }};
+      --panel:{{ settings.color_panel }};
+      --panel2:{{ settings.color_panel2 }};
+      --orange:{{ settings.color_accent }};
+      --orange2:{{ settings.color_accent2 }};
+      --green:{{ settings.color_success }};
+      --purple:{{ settings.color_purple }};
+      --bone:{{ settings.color_text }};
+      --line:{{ settings.color_accent | color_modify: 'alpha', 0.16 }};
+    }
+  </style>
+
+  <script>window.Shopify = window.Shopify || {};</script>
+</head>
+
+<body class="template-{{ template.name | handle }}{% if template.name == 'product' %} pdp-page{% endif %}"
+      data-cart-type="{{ settings.cart_type }}">
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  {% section 'announcement-bar' %}
+  {% section 'header' %}
+
+  <main id="main" role="main">
+    {{ content_for_layout }}
+  </main>
+
+  {% section 'footer' %}
+
+  {% render 'cart-drawer' %}
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* Strings and routes Liquid knows and JavaScript does not. */
+    window.THEME = {
+      routes: {
+        cart_add: '{{ routes.cart_add_url }}.js',
+        cart_change: '{{ routes.cart_change_url }}.js',
+        cart: '{{ routes.cart_url }}.js',
+        cart_page: '{{ routes.cart_url }}'
+      },
+      moneyFormat: {{ shop.money_format | json }},
+      strings: {
+        added: {{ 'products.product.added' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        unavailable: {{ 'products.product.unavailable' | t | json }},
+        addToCart: {{ 'products.product.add_to_cart' | t | json }}
+      }
+    };
+  </script>
+  <script src="{{ 'theme.js' | asset_url }}" defer></script>
+</body>
+</html>

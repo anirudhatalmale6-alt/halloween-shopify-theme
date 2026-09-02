@@ -1,0 +1,71 @@
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+
+    <a class="logo" href="{{ routes.root_url }}">
+      {%- if settings.logo != blank -%}
+        <img
+          src="{{ settings.logo | image_url: width: 400 }}"
+          alt="{{ shop.name | escape }}"
+          width="{{ settings.logo.width }}"
+          height="{{ settings.logo.height }}"
+          loading="eager"
+          style="width:{{ settings.logo_width }}px;height:auto">
+      {%- else -%}
+        {% render 'logo-mark' %}
+        <span class="logo__txt">
+          {{- settings.logo_text_a -}}
+          <em>&amp;</em>
+          {{- settings.logo_text_b -}}
+        </span>
+      {%- endif -%}
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Main">
+      {%- for link in section.settings.menu.links -%}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="hdr__act">
+      {%- if section.settings.show_search -%}
+        <a class="cartbtn" href="{{ routes.search_url }}" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+          </svg>
+        </a>
+      {%- endif -%}
+
+      <button class="cartbtn" id="cartbtn" aria-label="Open cart" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d="M6 7h12l-1.2 12.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8z"/>
+          <path d="M9 7V5.6A3 3 0 0 1 12 3a3 3 0 0 1 3 2.6V7"/>
+        </svg>
+        <span class="cartbtn__n{% if cart.item_count > 0 %} on{% endif %}" id="cartn">{{ cart.item_count }}</span>
+      </button>
+
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show the search icon",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

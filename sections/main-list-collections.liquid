@@ -1,0 +1,27 @@
+<section class="sec sec--top">
+  <div class="wrap">
+    <h1 class="sec__h">Collections</h1>
+    <div class="cats">
+      {%- for collection in collections -%}
+        <a class="cat rv" href="{{ collection.url }}">
+          {%- if collection.featured_image -%}
+            <img src="{{ collection.featured_image | image_url: width: 240 }}"
+                 alt="{{ collection.title | escape }}" width="240" height="240" loading="lazy">
+          {%- else -%}
+            {{ 'collection-1' | placeholder_svg_tag: 'cat__ph' }}
+          {%- endif -%}
+          <div class="cat__txt">
+            <h3>{{ collection.title }}</h3>
+            <p>{{ collection.products_count }} product{% if collection.products_count != 1 %}s{% endif %}</p>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collections list"
+}
+{% endschema %}

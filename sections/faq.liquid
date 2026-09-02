@@ -1,0 +1,100 @@
+<section class="sec" id="{{ section.settings.anchor | default: 'faq' }}">
+  <div class="wrap wrap--narrow">
+    {%- if section.settings.kicker != blank -%}
+      <p class="sec__k">{{ section.settings.kicker | escape }}</p>
+    {%- endif -%}
+    <h2 class="sec__h">{{ section.settings.heading | escape }}</h2>
+
+    <div class="faq">
+      {%- for block in section.blocks -%}
+        <details class="faq__item" {{ block.shopify_attributes }}>
+          <summary>
+            {{ block.settings.q | escape }}
+            <span class="faq__sign" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__a">{{ block.settings.a }}</div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Small line above the heading",
+      "default": "Questions"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Before you ask"
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id (for menu links)",
+      "default": "faq"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "qa",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "q",
+          "label": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "a",
+          "label": "Answer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "qa",
+          "settings": {
+            "q": "How long does delivery take?",
+            "a": "<p>Orders leave within 24 hours and most US addresses see them in 3 to 6 days. Order before October 24th and it will be with you for the 31st.</p>"
+          }
+        },
+        {
+          "type": "qa",
+          "settings": {
+            "q": "Is shipping really free?",
+            "a": "<p>Yes, on every US order, with no minimum spend.</p>"
+          }
+        },
+        {
+          "type": "qa",
+          "settings": {
+            "q": "What if I do not like it?",
+            "a": "<p>Send it back within 30 days for a full refund. You do not have to explain yourself.</p>"
+          }
+        },
+        {
+          "type": "qa",
+          "settings": {
+            "q": "Is checkout secure?",
+            "a": "<p>Checkout runs on Shopify with full encryption. We never see your card details.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

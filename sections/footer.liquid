@@ -1,0 +1,115 @@
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__in">
+
+      <div class="ftr__brand">
+        <a class="logo" href="{{ routes.root_url }}">
+          {% render 'logo-mark' %}
+          <span class="logo__txt">
+            {{- settings.logo_text_a -}}<em>&amp;</em>{{- settings.logo_text_b -}}
+          </span>
+        </a>
+        <p>{{ section.settings.blurb | escape }}</p>
+
+        {%- if settings.social_tiktok != blank or settings.social_instagram != blank or settings.social_facebook != blank -%}
+          <div class="ftr__social">
+            {%- if settings.social_tiktok != blank -%}
+              <a href="{{ settings.social_tiktok }}" rel="noopener" target="_blank">TikTok</a>
+            {%- endif -%}
+            {%- if settings.social_instagram != blank -%}
+              <a href="{{ settings.social_instagram }}" rel="noopener" target="_blank">Instagram</a>
+            {%- endif -%}
+            {%- if settings.social_facebook != blank -%}
+              <a href="{{ settings.social_facebook }}" rel="noopener" target="_blank">Facebook</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        <div class="ftr__col" {{ block.shopify_attributes }}>
+          <h4>{{ block.settings.heading | escape }}</h4>
+          {%- for link in block.settings.menu.links -%}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+
+    </div>
+
+    <div class="ftr__base">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ section.settings.legal | escape }}</p>
+      <div class="ftr__pay">
+        {%- for type in shop.enabled_payment_types -%}
+          {{ type | payment_type_svg_tag: class: 'ftr__payicon' }}
+        {%- else -%}
+          <span>VISA</span><span>MASTERCARD</span><span>AMEX</span><span>PAYPAL</span>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "blurb",
+      "label": "About text",
+      "default": "Halloween decor, costumes and party gear, shipped free across the US and delivered before the 31st."
+    },
+    {
+      "type": "text",
+      "id": "legal",
+      "label": "Legal line",
+      "default": "All rights reserved."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Link column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Shop"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "settings": {
+    },
+    "blocks": [
+      {
+        "type": "menu",
+        "settings": {
+          "heading": "Shop"
+        }
+      },
+      {
+        "type": "menu",
+        "settings": {
+          "heading": "Help"
+        }
+      },
+      {
+        "type": "menu",
+        "settings": {
+          "heading": "Company"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

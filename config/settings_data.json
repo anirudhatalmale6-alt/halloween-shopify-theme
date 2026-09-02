@@ -1,0 +1,71 @@
+{
+  "current": {
+    "logo_width": 150,
+    "logo_text_a": "Hollow",
+    "logo_text_b": "Hex",
+    "color_bg": "#0b0810",
+    "color_bg2": "#100b18",
+    "color_panel": "#171021",
+    "color_panel2": "#1e1529",
+    "color_text": "#f4efe6",
+    "color_accent": "#ff7518",
+    "color_accent2": "#ffa250",
+    "color_success": "#7bff6a",
+    "color_purple": "#a06bff",
+    "card_show_rating": true,
+    "card_fallback_rating": 4.8,
+    "card_show_blurb": true,
+    "card_show_save_badge": true,
+    "cart_type": "drawer",
+    "cart_note": "Secure checkout. Free US shipping on every order.",
+    "free_shipping_text": "Free",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "show_search": true
+        }
+      },
+      "announcement-bar": {
+        "type": "announcement-bar",
+        "settings": {
+          "show": true,
+          "strong": "Free US shipping",
+          "text": "on every order · Delivered before October 31st"
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "blurb": "Halloween decor, costumes and party gear, shipped free across the US and delivered before the 31st.",
+          "legal": "All rights reserved."
+        },
+        "blocks": {
+          "f1": {
+            "type": "menu",
+            "settings": {
+              "heading": "Shop"
+            }
+          },
+          "f2": {
+            "type": "menu",
+            "settings": {
+              "heading": "Help"
+            }
+          },
+          "f3": {
+            "type": "menu",
+            "settings": {
+              "heading": "Company"
+            }
+          }
+        },
+        "block_order": [
+          "f1",
+          "f2",
+          "f3"
+        ]
+      }
+    }
+  }
+}

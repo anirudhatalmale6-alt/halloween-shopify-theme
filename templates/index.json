@@ -1,0 +1,265 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "kicker": "Halloween 2026 · Now shipping",
+        "heading": "Make it a night they",
+        "heading_accent": "won't forget",
+        "text": "Decor, costumes and party gear that actually looks good. Free US shipping, and everything lands before the 31st.",
+        "btn1_text": "Shop everything",
+        "btn2_text": "Best sellers",
+        "show_countdown": true,
+        "cd_month": 10,
+        "cd_day": 31,
+        "cd_label": "Until Halloween — order early, stock does run out"
+      }
+    },
+    "trust": {
+      "type": "trust-bar",
+      "blocks": {
+        "b1": {
+          "type": "item",
+          "settings": {
+            "title": "Free shipping",
+            "text": "On every US order"
+          }
+        },
+        "b2": {
+          "type": "item",
+          "settings": {
+            "title": "Ships in 24h",
+            "text": "Order today, out tomorrow"
+          }
+        },
+        "b3": {
+          "type": "item",
+          "settings": {
+            "title": "30-day returns",
+            "text": "Changed your mind? Fine."
+          }
+        },
+        "b4": {
+          "type": "item",
+          "settings": {
+            "title": "Secure checkout",
+            "text": "Encrypted, every time"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4"
+      ]
+    },
+    "featured": {
+      "type": "featured-products",
+      "settings": {
+        "kicker": "Selling fast",
+        "heading": "This year's best sellers",
+        "sub": "The pieces people keep coming back for.",
+        "count": 8,
+        "show_view_all": true,
+        "alt_bg": false,
+        "anchor": "shop"
+      }
+    },
+    "categories": {
+      "type": "categories",
+      "settings": {
+        "kicker": "Browse",
+        "heading": "Shop by category",
+        "alt_bg": true,
+        "anchor": "categories"
+      },
+      "blocks": {
+        "c1": {
+          "type": "cat",
+          "settings": {
+            "title": "Decor",
+            "text": "Props, animatronics and everything for the porch"
+          }
+        },
+        "c2": {
+          "type": "cat",
+          "settings": {
+            "title": "Costumes",
+            "text": "For you, the kids and the dog"
+          }
+        },
+        "c3": {
+          "type": "cat",
+          "settings": {
+            "title": "Lighting",
+            "text": "Fog, projectors and things that glow"
+          }
+        },
+        "c4": {
+          "type": "cat",
+          "settings": {
+            "title": "Party",
+            "text": "Tableware, games and the rest of the night"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ]
+    },
+    "why": {
+      "type": "why-us",
+      "settings": {
+        "kicker": "Why us",
+        "heading": "Halloween, done properly",
+        "text": "Anyone can sell a plastic pumpkin. We pick pieces that hold up on the night and look like you meant it.",
+        "btn_text": "Start shopping",
+        "anchor": "why"
+      },
+      "blocks": {
+        "p1": {
+          "type": "point",
+          "settings": {
+            "text": "Free shipping on every US order, no minimum"
+          }
+        },
+        "p2": {
+          "type": "point",
+          "settings": {
+            "text": "Everything ships within 24 hours"
+          }
+        },
+        "p3": {
+          "type": "point",
+          "settings": {
+            "text": "Ordered before October 24th? It arrives in time"
+          }
+        },
+        "p4": {
+          "type": "point",
+          "settings": {
+            "text": "30-day returns, no interrogation"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ]
+    },
+    "reviews": {
+      "type": "reviews",
+      "settings": {
+        "kicker": "Reviews",
+        "heading": "What people said",
+        "alt_bg": true,
+        "anchor": "reviews"
+      },
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "quote": "Turned up three days after I ordered and the quality is way past what I paid. Neighbours have asked where it came from twice.",
+            "name": "Danielle R.",
+            "place": "Philadelphia, PA",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "quote": "I have bought Halloween stuff online for years and most of it is junk. This is the first time I would order again without thinking about it.",
+            "name": "Marcus T.",
+            "place": "Austin, TX",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "quote": "Ordered late and still had it before the weekend. Kids lost their minds.",
+            "name": "Priya S.",
+            "place": "Chicago, IL",
+            "rating": 5,
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Get 10% off your first order",
+        "text": "One email when something good lands. No daily nonsense.",
+        "anchor": "newsletter"
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "kicker": "Questions",
+        "heading": "Before you ask",
+        "anchor": "faq"
+      },
+      "blocks": {
+        "q1": {
+          "type": "qa",
+          "settings": {
+            "q": "How long does delivery take?",
+            "a": "<p>Orders leave within 24 hours and most US addresses see them in 3 to 6 days. Order before October 24th and it will be with you for the 31st.</p>"
+          }
+        },
+        "q2": {
+          "type": "qa",
+          "settings": {
+            "q": "Is shipping really free?",
+            "a": "<p>Yes, on every US order, with no minimum spend.</p>"
+          }
+        },
+        "q3": {
+          "type": "qa",
+          "settings": {
+            "q": "What if I do not like it?",
+            "a": "<p>Send it back within 30 days for a full refund. You do not have to explain yourself.</p>"
+          }
+        },
+        "q4": {
+          "type": "qa",
+          "settings": {
+            "q": "Is checkout secure?",
+            "a": "<p>Checkout runs on Shopify with full encryption. We never see your card details.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "trust",
+    "featured",
+    "categories",
+    "why",
+    "reviews",
+    "newsletter",
+    "faq"
+  ]
+}

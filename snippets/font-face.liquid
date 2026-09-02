@@ -1,0 +1,37 @@
+{%- comment -%}
+  Self-hosted fonts, served from Shopify's CDN alongside the rest of the theme.
+
+  This replaces a Google Fonts <link>, which was a render-blocking request to a
+  third party on every page load - and is blocked outright in some countries,
+  where it would have silently dropped the store to a system font.
+
+  Inter is the variable file, so ONE download covers 300 through 700. Declaring
+  the axis range on a single @font-face is what makes that work; listing the
+  weights separately would fetch the same file five times.
+
+  Both faces are SIL Open Font License, which permits self-hosting.
+
+  theme-check suggests the preload_tag filter here. These are written out by
+  hand on purpose: a font preload MUST carry crossorigin, and if it does not
+  match the crossorigin of the actual @font-face fetch the browser downloads
+  the file twice - slower than not preloading at all. Explicit tags make that
+  attribute impossible to lose.
+{%- endcomment -%}
+<link rel="preload" as="font" type="font/woff2" href="{{ 'inter.woff2' | asset_url }}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{{ 'anton.woff2' | asset_url }}" crossorigin>
+<style>
+  @font-face{
+    font-family:'Inter';
+    font-style:normal;
+    font-weight:100 900;
+    font-display:swap;
+    src:url({{ 'inter.woff2' | asset_url }}) format('woff2');
+  }
+  @font-face{
+    font-family:'Anton';
+    font-style:normal;
+    font-weight:400;
+    font-display:swap;
+    src:url({{ 'anton.woff2' | asset_url }}) format('woff2');
+  }
+</style>

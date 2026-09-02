@@ -1,0 +1,108 @@
+{%- comment -%}
+  Product grid card.
+    product - required
+
+  The image and the title link to the product; the Add button does not sit
+  inside that link, because a button nested in an anchor is both invalid and
+  ambiguous to click.
+
+  A card cannot choose a variant, so a product with real options sends the
+  visitor to its page instead of adding blind. Guessing the first variant is how
+  people receive the wrong size.
+{%- endcomment -%}
+
+{%- liquid
+  assign v = product.selected_or_first_available_variant
+  assign on_sale = false
+  if v.compare_at_price > v.price
+    assign on_sale = true
+    comment
+      floor, not round. 49.99 against 79.99 is 37.5% off, and round turns that
+      into "38% off" - a discount claim slightly larger than the real one, on
+      a page built for paid ads. Rounding a saving DOWN is always safe.
+    endcomment
+    assign save_pct = v.compare_at_price | minus: v.price | times: 100.0 | divided_by: v.compare_at_price | floor
+  endif
+
+  assign badge = product.metafields.custom.badge.value
+  if badge == blank
+    for t in product.tags
+      if t contains 'badge:'
+        assign badge = t | remove_first: 'badge:' | strip
+        break
+      endif
+    endfor
+  endif
+
+  assign rating = product.metafields.reviews.rating.value.rating | default: settings.card_fallback_rating
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+
+  assign simple = false
+  if product.has_only_default_variant or product.variants.size == 1
+    assign simple = true
+  endif
+-%}
+
+<article class="card rv">
+  <a class="card__media" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    {%- if badge != blank -%}
+      <span class="badge">{{ badge }}</span>
+    {%- endif -%}
+
+    {%- if on_sale and settings.card_show_save_badge -%}
+      <span class="card__off">&minus;{{ save_pct }}%</span>
+    {%- endif -%}
+
+    {%- if product.featured_image -%}
+      <img
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        srcset="{{ product.featured_image | image_url: width: 300 }} 300w,
+                {{ product.featured_image | image_url: width: 600 }} 600w,
+                {{ product.featured_image | image_url: width: 900 }} 900w"
+        sizes="(max-width:640px) 45vw, (max-width:1024px) 30vw, 280px"
+        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+        width="600" height="600" loading="lazy">
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'card__ph' }}
+    {%- endif -%}
+  </a>
+
+  <div class="card__body">
+    {%- if settings.card_show_rating -%}
+      <div class="card__rating">
+        {%- if rating_count > 0 -%}
+          {%- capture rc -%}({% render 'thousands', n: rating_count %}){%- endcapture -%}
+          {% render 'stars', rating: rating, count: rc %}
+        {%- else -%}
+          {% render 'stars', rating: rating %}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <h3 class="card__name"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+
+    {%- if settings.card_show_blurb -%}
+      {%- assign blurb = product.metafields.custom.short_description.value | default: product.description -%}
+      {%- if blurb != blank -%}
+        <p class="card__blurb">{{ blurb | strip_html | truncatewords: 18 }}</p>
+      {%- endif -%}
+    {%- endif -%}
+
+    <div class="card__foot">
+      <div class="card__price">
+        <span class="price">{{ v.price | money }}</span>
+        {%- if on_sale -%}
+          <span class="was">{{ v.compare_at_price | money }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- if product.available == false -%}
+        <button class="btn btn--add" type="button" disabled>Sold out</button>
+      {%- elsif simple -%}
+        <button class="btn btn--add js-add" type="button" data-vid="{{ v.id }}">Add</button>
+      {%- else -%}
+        <a class="btn btn--add" href="{{ product.url }}">Choose</a>
+      {%- endif -%}
+    </div>
+  </div>
+</article>

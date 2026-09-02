@@ -1,0 +1,197 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Hollow & Hex",
+    "theme_version": "1.0.0",
+    "theme_author": "Anirudha Talmale",
+    "theme_documentation_url": "https://github.com/anirudhatalmale6-alt/halloween-store-demo",
+    "theme_support_url": "https://github.com/anirudhatalmale6-alt/halloween-store-demo"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo image",
+        "info": "Leave empty to use the text logo below with the drawn pumpkin mark."
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Logo width",
+        "min": 60,
+        "max": 260,
+        "step": 10,
+        "unit": "px",
+        "default": 150
+      },
+      {
+        "type": "text",
+        "id": "logo_text_a",
+        "label": "Logo text - first word",
+        "default": "Hollow"
+      },
+      {
+        "type": "text",
+        "id": "logo_text_b",
+        "label": "Logo text - second word",
+        "default": "Hex"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon"
+      }
+    ]
+  },
+  {
+    "name": "Colours",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Every colour on the store comes from these. Change one here and it updates everywhere it is used."
+      },
+      {
+        "type": "color",
+        "id": "color_bg",
+        "label": "Page background",
+        "default": "#0b0810"
+      },
+      {
+        "type": "color",
+        "id": "color_bg2",
+        "label": "Alternate section background",
+        "default": "#100b18"
+      },
+      {
+        "type": "color",
+        "id": "color_panel",
+        "label": "Card background",
+        "default": "#171021"
+      },
+      {
+        "type": "color",
+        "id": "color_panel2",
+        "label": "Raised card background",
+        "default": "#1e1529"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Text",
+        "default": "#f4efe6"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent (buttons, links)",
+        "default": "#ff7518"
+      },
+      {
+        "type": "color",
+        "id": "color_accent2",
+        "label": "Accent light",
+        "default": "#ffa250"
+      },
+      {
+        "type": "color",
+        "id": "color_success",
+        "label": "Savings / in stock",
+        "default": "#7bff6a"
+      },
+      {
+        "type": "color",
+        "id": "color_purple",
+        "label": "Secondary accent",
+        "default": "#a06bff"
+      }
+    ]
+  },
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "card_show_rating",
+        "label": "Show star rating",
+        "default": true,
+        "info": "Uses the product metafield reviews.rating if you have a reviews app, otherwise the fallback rating below."
+      },
+      {
+        "type": "range",
+        "id": "card_fallback_rating",
+        "label": "Fallback rating",
+        "min": 3,
+        "max": 5,
+        "step": 0.1,
+        "default": 4.8
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_blurb",
+        "label": "Show a short description on the card",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_save_badge",
+        "label": "Show the percentage saved when a product is on sale",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart behaviour",
+        "options": [
+          {
+            "value": "drawer",
+            "label": "Slide-out drawer"
+          },
+          {
+            "value": "page",
+            "label": "Go to the cart page"
+          }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "text",
+        "id": "cart_note",
+        "label": "Note under the checkout button",
+        "default": "Secure checkout. Free US shipping on every order."
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_text",
+        "label": "Shipping line in the cart",
+        "default": "Free"
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_tiktok",
+        "label": "TikTok"
+      },
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "social_facebook",
+        "label": "Facebook"
+      }
+    ]
+  }
+]

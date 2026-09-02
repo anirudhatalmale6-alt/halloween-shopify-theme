@@ -1,0 +1,23 @@
+{%- comment -%}
+  Renders a whole number with a thousands separator: 1284 -> 1,284.
+
+  Liquid has no such filter and Shopify does not add one, but review counts are
+  a trust signal and they appear on every card. "1284 reviews" reads like raw
+  data; "1,284 reviews" reads like a shop.
+
+  Handles up to 9,999,999, which is well past anything a review count reaches.
+    n - the number
+{%- endcomment -%}
+{%- assign num = n | plus: 0 -%}
+{%- if num >= 1000000 -%}
+  {%- assign m = num | divided_by: 1000000 -%}
+  {%- assign k = num | modulo: 1000000 | divided_by: 1000 | prepend: '00' | slice: -3, 3 -%}
+  {%- assign u = num | modulo: 1000 | prepend: '00' | slice: -3, 3 -%}
+  {{- m }},{{ k }},{{ u -}}
+{%- elsif num >= 1000 -%}
+  {%- assign k = num | divided_by: 1000 -%}
+  {%- assign u = num | modulo: 1000 | prepend: '00' | slice: -3, 3 -%}
+  {{- k }},{{ u -}}
+{%- else -%}
+  {{- num -}}
+{%- endif -%}

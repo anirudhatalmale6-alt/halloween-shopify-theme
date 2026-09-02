@@ -1,0 +1,106 @@
+<section class="sec {% if section.settings.alt_bg %}sec--alt{% endif %}" id="{{ section.settings.anchor | default: 'shop' }}">
+  <div class="wrap">
+    {%- if section.settings.kicker != blank -%}
+      <p class="sec__k">{{ section.settings.kicker | escape }}</p>
+    {%- endif -%}
+    <h2 class="sec__h">{{ section.settings.heading | escape }}</h2>
+    {%- if section.settings.sub != blank -%}
+      <p class="sec__sub">{{ section.settings.sub | escape }}</p>
+    {%- endif -%}
+
+    {%- comment -%}
+      With no collection chosen the section falls back to `collections.all`,
+      Shopify's automatic every-product collection.
+
+      Without this, a freshly installed theme shows a homepage with no products
+      on it until the merchant happens to open the editor and pick something -
+      which looks like a broken store, not an unconfigured one.
+    {%- endcomment -%}
+    {%- assign coll = section.settings.collection | default: collections.all -%}
+    {%- if coll != blank and coll.products.size > 0 -%}
+      <div class="grid">
+        {%- for product in coll.products limit: section.settings.count -%}
+          {% render 'product-card', product: product %}
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.show_view_all -%}
+        <div class="sec__more">
+          <a class="btn btn--ghost" href="{{ coll.url }}">View all {{ coll.products_count }} products</a>
+        </div>
+      {%- endif -%}
+
+    {%- else -%}
+      {%- comment -%}
+        No collection chosen yet, or an empty one. Say so plainly in the editor
+        rather than rendering an empty grid that looks like a broken theme.
+      {%- endcomment -%}
+      <div class="sec__empty">
+        <p>Pick a collection for this section in the theme editor, and the products will appear here.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product grid",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Small line above the heading",
+      "default": "Selling fast"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "This year's best sellers"
+    },
+    {
+      "type": "textarea",
+      "id": "sub",
+      "label": "Text under the heading",
+      "default": "The pieces people keep coming back for."
+    },
+    {
+      "type": "range",
+      "id": "count",
+      "label": "Products to show",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show a 'view all' button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "alt_bg",
+      "label": "Use the alternate background",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id (for menu links)",
+      "default": "shop"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product grid"
+    }
+  ]
+}
+{% endschema %}

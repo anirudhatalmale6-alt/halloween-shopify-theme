@@ -1,0 +1,30 @@
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="cart" id="cart" role="dialog" aria-modal="true" aria-label="Shopping cart" aria-hidden="true">
+  <div class="cart__hd">
+    <h2>Your cart</h2>
+    <button class="cart__x" id="cartx" aria-label="Close cart">&times;</button>
+  </div>
+
+  <div class="cart__body" id="cartbody">
+    {% render 'cart-items', cart: cart %}
+  </div>
+
+  <div class="cart__ft">
+    <div class="cart__row">
+      <span>Subtotal</span>
+      <b id="cartsub">{{ cart.total_price | money }}</b>
+    </div>
+    <div class="cart__row cart__row--ship">
+      <span>Shipping</span>
+      <b>{{ settings.free_shipping_text }}</b>
+    </div>
+    <form action="{{ routes.cart_url }}" method="post">
+      <button type="submit" name="checkout" class="btn btn--gold btn--wide" id="checkout"
+              {% if cart.item_count == 0 %}disabled{% endif %}>
+        Checkout
+      </button>
+    </form>
+    <p class="cart__note">{{ settings.cart_note | escape }}</p>
+  </div>
+</aside>

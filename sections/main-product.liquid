@@ -1,0 +1,422 @@
+{%- liquid
+  assign v = product.selected_or_first_available_variant
+
+  assign on_sale = false
+  if v.compare_at_price > v.price
+    assign on_sale = true
+    comment
+      floor, not round. 49.99 against 79.99 is 37.5% off, and round turns that
+      into "38% off" - a discount claim slightly larger than the real one, on
+      a page built for paid ads. Rounding a saving DOWN is always safe.
+    endcomment
+    assign save_pct = v.compare_at_price | minus: v.price | times: 100.0 | divided_by: v.compare_at_price | floor
+    assign save_amt = v.compare_at_price | minus: v.price
+  endif
+
+  assign rating = product.metafields.reviews.rating.value.rating | default: settings.card_fallback_rating
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+
+  assign hook = product.metafields.custom.hook.value | default: product.metafields.custom.short_description.value
+
+  comment
+    Bullets are optional. With no metafield we take the first sentences of the
+    description, so a product imported with nothing but a title, a price, a
+    photo and a paragraph still produces a finished page. Written detail is an
+    upgrade, never a prerequisite for shipping.
+  endcomment
+  assign bullets = product.metafields.custom.bullets.value
+  if bullets == blank and product.description != blank
+    assign plain = product.description | strip_html | strip
+    assign bullets = plain | split: '. '
+  endif
+-%}
+
+<section class="pdp">
+  <div class="wrap pdp__in">
+
+    {%- comment -%} ---------------- gallery ---------------- {%- endcomment -%}
+    <div class="pdp__gal">
+      <div class="pdp__stage" id="stage">
+        {%- if on_sale and section.settings.show_save -%}
+          <span class="pdp__off">Save {{ save_pct }}%</span>
+        {%- endif -%}
+
+        {%- if product.featured_media -%}
+          <img id="stageimg"
+               src="{{ product.featured_media | image_url: width: 900 }}"
+               alt="{{ product.featured_media.alt | default: product.title | escape }}"
+               width="900" height="900" loading="eager" fetchpriority="high">
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'pdp__ph' }}
+        {%- endif -%}
+      </div>
+
+      {%- if product.media.size > 1 -%}
+        <div class="pdp__thumbs" id="thumbs">
+          {%- for media in product.media limit: 8 -%}
+            <button class="pdp__thumb{% if forloop.first %} on{% endif %}" type="button"
+                    data-full="{{ media | image_url: width: 900 }}"
+                    aria-label="View image {{ forloop.index }}">
+              <img src="{{ media | image_url: width: 220 }}"
+                   alt="{{ media.alt | default: product.title | escape }}"
+                   width="220" height="220" loading="lazy">
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------------- buy box ---------------- {%- endcomment -%}
+    <div class="pdp__buy">
+      <nav class="pdp__crumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">Home</a><span>/</span>
+        {%- if collection -%}
+          <a href="{{ collection.url }}">{{ collection.title }}</a><span>/</span>
+        {%- endif -%}
+        {{ product.title }}
+      </nav>
+
+      <h1 class="pdp__h">{{ product.title }}</h1>
+
+      {%- if section.settings.show_rating -%}
+        <div class="pdp__rate">
+          {%- if rating_count > 0 -%}
+            {%- capture rc -%}
+              {{ rating }} &middot; {% render 'thousands', n: rating_count %} review{% unless rating_count == 1 %}s{% endunless %}
+            {%- endcapture -%}
+            {% render 'stars', rating: rating, count: rc, cls: 'pdp__rc' %}
+          {%- else -%}
+            {% render 'stars', rating: rating %}
+            <span class="pdp__rc">{{ rating }} out of 5</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if hook != blank -%}
+        <p class="pdp__hook">{{ hook }}</p>
+      {%- endif -%}
+
+      <div class="pdp__price">
+        <span class="price" id="pprice">{{ v.price | money }}</span>
+        {%- if on_sale -%}
+          <span class="was" id="pwas">{{ v.compare_at_price | money }}</span>
+          <span class="pdp__save">You save {{ save_amt | money }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- if bullets != blank -%}
+        <ul class="pdp__bul">
+          {%- for b in bullets limit: 5 -%}
+            {%- assign line = b | strip | strip_html -%}
+            {%- if line != blank -%}
+              <li>{{ line }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if section.settings.show_stock and v.inventory_management != blank and v.inventory_quantity > 0 and v.inventory_quantity <= section.settings.low_stock -%}
+        {%- assign pct = v.inventory_quantity | times: 100 | divided_by: section.settings.low_stock -%}
+        <div class="pdp__stock">
+          <div class="pdp__bar"><i style="width:{{ pct }}%"></i></div>
+          <p>Only {{ v.inventory_quantity }} left in stock</p>
+        </div>
+      {%- endif -%}
+
+      {%- form 'product', product, id: 'buyform', class: 'pdp__form' -%}
+        <input type="hidden" name="id" id="vid" value="{{ v.id }}">
+
+        {%- unless product.has_only_default_variant -%}
+          <div class="pdp__opts" id="opts">
+            {%- for option in product.options_with_values -%}
+              <div class="opt" data-idx="{{ forloop.index0 }}">
+                <span class="opt__label">{{ option.name }}: <b data-sel>{{ option.selected_value }}</b></span>
+                <div class="opt__vals">
+                  {%- for value in option.values -%}
+                    <label class="pill{% if value == option.selected_value %} on{% endif %}">
+                      <input type="radio"
+                             name="opt-{{ forloop.parentloop.index0 }}"
+                             value="{{ value | escape }}"
+                             {% if value == option.selected_value %}checked{% endif %}>
+                      <span>{{ value }}</span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endunless -%}
+
+        <div class="pdp__act">
+          <div class="qty" id="qty">
+            <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
+            <b id="qtyn">1</b>
+            <button type="button" data-q="1" aria-label="Increase quantity">&plus;</button>
+          </div>
+          <input type="hidden" name="quantity" id="qtyi" value="1">
+
+          <button class="btn btn--add" type="submit" id="buybtn" {% unless v.available %}disabled{% endunless %}>
+            {%- if v.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
+          </button>
+        </div>
+
+        {%- if section.settings.show_dynamic_checkout -%}
+          {{ form | payment_button }}
+        {%- endif -%}
+      {%- endform -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <ul class="pdp__trust">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'assurance' -%}
+              <li {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <script type="application/json" id="variant-data">
+    {{ product.variants | json }}
+  </script>
+</section>
+
+{%- comment -%} ---------------- features ---------------- {%- endcomment -%}
+{%- assign features = product.metafields.custom.features.value -%}
+{%- if features != blank -%}
+  <section class="sec sec--alt">
+    <div class="wrap">
+      <p class="sec__k">Why it works</p>
+      <h2 class="sec__h">{{ section.settings.features_heading | escape }}</h2>
+      <div class="feats">
+        {%- for f in features limit: 6 -%}
+          {%- assign parts = f | split: '|' -%}
+          <div class="feat rv">
+            <h3>{{ parts[0] | strip }}</h3>
+            {%- if parts[1] -%}<p>{{ parts[1] | strip }}</p>{%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{%- comment -%} ---------------- description, specs, in the box ---------------- {%- endcomment -%}
+{%- assign specs = product.metafields.custom.specs.value -%}
+{%- assign in_box = product.metafields.custom.in_the_box.value -%}
+
+<section class="sec">
+  <div class="wrap spec">
+    <div class="spec__tbl">
+      <h2 class="sec__h">{{ section.settings.details_heading | escape }}</h2>
+
+      {%- if product.description != blank -%}
+        <div class="rte">{{ product.description }}</div>
+      {%- endif -%}
+
+      <table>
+        <tbody>
+          {%- if specs != blank -%}
+            {%- for s in specs -%}
+              {%- assign parts = s | split: '|' -%}
+              <tr><th>{{ parts[0] | strip }}</th><td>{{ parts[1] | strip }}</td></tr>
+            {%- endfor -%}
+          {%- endif -%}
+
+          {%- comment -%}
+            Rows Shopify already knows. They fill the table for a product whose
+            spec metafield was never written.
+          {%- endcomment -%}
+          {%- if product.type != blank -%}
+            <tr><th>Category</th><td>{{ product.type }}</td></tr>
+          {%- endif -%}
+          {%- if product.vendor != blank -%}
+            <tr><th>Brand</th><td>{{ product.vendor }}</td></tr>
+          {%- endif -%}
+          {%- if v.sku != blank -%}
+            <tr><th>Item code</th><td>{{ v.sku }}</td></tr>
+          {%- endif -%}
+          {%- if v.weight > 0 -%}
+            <tr><th>Weight</th><td>{{ v.weight | weight_with_unit: v.weight_unit }}</td></tr>
+          {%- endif -%}
+          <tr><th>Shipping</th><td>{{ section.settings.shipping_line | escape }}</td></tr>
+          <tr><th>Returns</th><td>{{ section.settings.returns_line | escape }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec__box">
+      {%- if in_box != blank -%}
+        <h2 class="sec__h">In the box</h2>
+        <ul class="ticks">
+          {%- for i in in_box -%}
+            <li>{{ i }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if product.featured_media -%}
+        <img class="spec__art"
+             src="{{ product.featured_media | image_url: width: 500 }}"
+             alt="{{ product.title | escape }}"
+             width="500" height="500" loading="lazy">
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{%- comment -%} ---------------- sticky mobile buy bar ---------------- {%- endcomment -%}
+<div class="stick" id="stick" aria-hidden="true">
+  {%- if product.featured_media -%}
+    <img src="{{ product.featured_media | image_url: width: 120 }}" alt="" width="44" height="44" loading="lazy">
+  {%- endif -%}
+  <div class="stick__m">
+    <p>{{ product.title }}</p>
+    <span>
+      <b id="stickprice">{{ v.price | money }}</b>
+      {%- if on_sale -%}<s>{{ v.compare_at_price | money }}</s>{%- endif -%}
+    </span>
+  </div>
+  <button class="btn btn--add" type="button" id="stickadd" {% unless v.available %}disabled{% endunless %}>
+    {%- if v.available -%}Add{%- else -%}Sold out{%- endif -%}
+  </button>
+</div>
+
+{%- comment -%}
+  Product structured data, written out rather than left to a filter, so the
+  fields are ours to control.
+
+  aggregateRating is emitted ONLY when a reviews app has supplied a real count.
+  The star rating on the page falls back to a default for products with no
+  reviews yet, and putting that fallback into structured data would be telling
+  Google about ratings that do not exist - which is exactly what gets rich
+  results revoked for a whole domain.
+{%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "url": {{ request.origin | append: product.url | json }},
+  {%- if product.featured_media -%}
+  "image": [{{ product.featured_media | image_url: width: 1200 | prepend: "https:" | json }}],
+  {%- endif -%}
+  "description": {{ product.description | strip_html | truncate: 500 | json }},
+  {%- if product.vendor != blank -%}
+  "brand": { "@type": "Brand", "name": {{ product.vendor | json }} },
+  {%- endif -%}
+  {%- if v.sku != blank -%}
+  "sku": {{ v.sku | json }},
+  {%- endif -%}
+  {%- if rating_count > 0 -%}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": {{ rating | json }},
+    "reviewCount": {{ rating_count | json }}
+  },
+  {%- endif -%}
+  "offers": [
+    {%- for variant in product.variants -%}
+    {
+      "@type": "Offer",
+      {%- if variant.sku != blank -%}
+      "sku": {{ variant.sku | json }},
+      {%- endif -%}
+      "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+      "price": {{ variant.price | divided_by: 100.0 | json }},
+      "priceCurrency": {{ cart.currency.iso_code | json }},
+      "url": {{ request.origin | append: variant.url | json }}
+    }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]
+}
+</script>
+
+{% schema %}
+{
+  "name": "Product page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star rating",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_save",
+      "label": "Show the savings badge on the image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show the express checkout buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Stock urgency"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stock",
+      "label": "Show a low-stock bar",
+      "default": true,
+      "info": "Only appears when Shopify is actually tracking inventory for the variant, so it can never show a number you cannot back up."
+    },
+    {
+      "type": "range",
+      "id": "low_stock",
+      "label": "Show the bar under this many units",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "default": 25
+    },
+    {
+      "type": "header",
+      "content": "Headings"
+    },
+    {
+      "type": "text",
+      "id": "features_heading",
+      "label": "Features heading",
+      "default": "Built for the night"
+    },
+    {
+      "type": "text",
+      "id": "details_heading",
+      "label": "Details heading",
+      "default": "The details"
+    },
+    {
+      "type": "text",
+      "id": "shipping_line",
+      "label": "Shipping row",
+      "default": "Free US shipping, ships within 24 hours"
+    },
+    {
+      "type": "text",
+      "id": "returns_line",
+      "label": "Returns row",
+      "default": "30 days, no questions"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "assurance",
+      "name": "Assurance line",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Free US shipping on every order"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

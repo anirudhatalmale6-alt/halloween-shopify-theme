@@ -1,0 +1,15 @@
+<section class="sec sec--top">
+  <div class="wrap wrap--narrow">
+    <h1 class="sec__h">{{ 'customer.activate_account.title' | t }}</h1>
+    <p class="sec__sub">{{ 'customer.activate_account.subtext' | t }}</p>
+    {%- form 'activate_customer_password' -%}
+      {{ form.errors | default_errors }}
+      <div class="fld"><label for="ac-pw">{{ 'customer.activate_account.password' | t }}</label>
+        <input type="password" id="ac-pw" name="customer[password]" autocomplete="new-password"></div>
+      <div class="fld"><label for="ac-pc">{{ 'customer.activate_account.password_confirm' | t }}</label>
+        <input type="password" id="ac-pc" name="customer[password_confirmation]" autocomplete="new-password"></div>
+      <button class="btn btn--gold" type="submit">{{ 'customer.activate_account.submit' | t }}</button>
+      <button class="btn btn--ghost" type="submit" name="decline">{{ 'customer.activate_account.decline' | t }}</button>
+    {%- endform -%}
+  </div>
+</section>

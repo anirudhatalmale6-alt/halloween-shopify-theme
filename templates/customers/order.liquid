@@ -1,0 +1,32 @@
+<section class="sec sec--top">
+  <div class="wrap">
+    <h1 class="sec__h">{{ order.name }}</h1>
+    <p class="sec__sub">{{ order.created_at | date: '%B %-d, %Y' }} &middot;
+      <a class="lnk" href="{{ routes.account_url }}">{{ 'customer.account.return' | t }}</a></p>
+
+    <table class="tbl">
+      <thead><tr>
+        <th>{{ 'customer.orders.product' | t }}</th>
+        <th>{{ 'customer.orders.price' | t }}</th>
+        <th>{{ 'customer.orders.quantity' | t }}</th>
+        <th>{{ 'customer.orders.total' | t }}</th>
+      </tr></thead>
+      <tbody>
+        {%- for line in order.line_items -%}
+          <tr>
+            <td>{{ line.title }}</td>
+            <td>{{ line.price | money }}</td>
+            <td>{{ line.quantity }}</td>
+            <td>{{ line.line_price | money }}</td>
+          </tr>
+        {%- endfor -%}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="3">{{ 'customer.orders.subtotal' | t }}</td><td>{{ order.subtotal_price | money }}</td></tr>
+        <tr><td colspan="3">{{ 'customer.orders.shipping' | t }}</td><td>{{ order.shipping_price | money }}</td></tr>
+        <tr><td colspan="3">{{ 'customer.orders.tax' | t }}</td><td>{{ order.tax_price | money }}</td></tr>
+        <tr><td colspan="3">{{ 'customer.orders.total' | t }}</td><td>{{ order.total_price | money }}</td></tr>
+      </tfoot>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,63 @@
+<section class="sec {% if section.settings.alt_bg %}sec--alt{% endif %}">
+  <div class="wrap wrap--narrow" style="text-align:center">
+    {%- if section.settings.kicker != blank -%}
+      <p class="sec__k">{{ section.settings.kicker | escape }}</p>
+    {%- endif -%}
+    <h2 class="sec__h">{{ section.settings.heading | escape }}</h2>
+    {%- if section.settings.text != blank -%}
+      <div class="sec__sub rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+    {%- if section.settings.btn_text != blank -%}
+      <p class="sec__more">
+        <a class="btn btn--gold" href="{{ section.settings.btn_link | default: routes.all_products_collection_url }}">
+          {{ section.settings.btn_text | escape }}
+        </a>
+      </p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Text block",
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Small line above the heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tell them something"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "alt_bg",
+      "label": "Use the alternate background",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text block"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,42 @@
+{%- comment -%}
+  Shopify's own recommendations. Rendered inside a container the JS refreshes
+  via the recommendations endpoint, because on the first paint Shopify has not
+  always computed them yet.
+{%- endcomment -%}
+<section class="sec sec--alt" id="recs"
+         data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.count }}">
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <div class="wrap">
+      <p class="sec__k">You might also like</p>
+      <h2 class="sec__h">{{ section.settings.heading | escape }}</h2>
+      <div class="grid">
+        {%- for product in recommendations.products -%}
+          {% render 'product-card', product: product %}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "You might also like",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "People also bought"
+    },
+    {
+      "type": "range",
+      "id": "count",
+      "label": "Products to show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    }
+  ]
+}
+{% endschema %}

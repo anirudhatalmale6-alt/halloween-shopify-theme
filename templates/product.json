@@ -1,0 +1,98 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "show_rating": true,
+        "show_save": true,
+        "show_dynamic_checkout": true,
+        "show_stock": true,
+        "low_stock": 25,
+        "features_heading": "Built for the night",
+        "details_heading": "The details",
+        "shipping_line": "Free US shipping, ships within 24 hours",
+        "returns_line": "30 days, no questions"
+      },
+      "blocks": {
+        "a1": {
+          "type": "assurance",
+          "settings": {
+            "text": "Free US shipping on every order"
+          }
+        },
+        "a2": {
+          "type": "assurance",
+          "settings": {
+            "text": "Ships within 24 hours of ordering"
+          }
+        },
+        "a3": {
+          "type": "assurance",
+          "settings": {
+            "text": "30-day returns, no questions asked"
+          }
+        },
+        "a4": {
+          "type": "assurance",
+          "settings": {
+            "text": "Secure encrypted checkout"
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2",
+        "a3",
+        "a4"
+      ]
+    },
+    "recs": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "People also bought",
+        "count": 4
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "kicker": "Questions",
+        "heading": "Before you order",
+        "anchor": "faq"
+      },
+      "blocks": {
+        "q1": {
+          "type": "qa",
+          "settings": {
+            "q": "When will it arrive?",
+            "a": "<p>Within 24 hours it is on its way, and most US addresses have it in 3 to 6 days.</p>"
+          }
+        },
+        "q2": {
+          "type": "qa",
+          "settings": {
+            "q": "Can I return it?",
+            "a": "<p>Yes. 30 days, full refund, no interrogation.</p>"
+          }
+        },
+        "q3": {
+          "type": "qa",
+          "settings": {
+            "q": "Do you ship outside the US?",
+            "a": "<p>Get in touch before ordering and we will confirm what is possible for your country.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "recs",
+    "faq"
+  ]
+}

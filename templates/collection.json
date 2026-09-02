@@ -1,0 +1,53 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-collection",
+      "settings": {
+        "per_page": 24
+      }
+    },
+    "trust": {
+      "type": "trust-bar",
+      "blocks": {
+        "b1": {
+          "type": "item",
+          "settings": {
+            "title": "Free shipping",
+            "text": "On every US order"
+          }
+        },
+        "b2": {
+          "type": "item",
+          "settings": {
+            "title": "Ships in 24h",
+            "text": "Order today, out tomorrow"
+          }
+        },
+        "b3": {
+          "type": "item",
+          "settings": {
+            "title": "30-day returns",
+            "text": "Changed your mind? Fine."
+          }
+        },
+        "b4": {
+          "type": "item",
+          "settings": {
+            "title": "Secure checkout",
+            "text": "Encrypted, every time"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "trust"
+  ]
+}

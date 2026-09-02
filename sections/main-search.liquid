@@ -1,0 +1,41 @@
+<section class="sec sec--top">
+  <div class="wrap">
+    <h1 class="sec__h">Search</h1>
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="srch">
+      <label class="visually-hidden" for="q">Search</label>
+      <input type="search" id="q" name="q" value="{{ search.terms | escape }}" placeholder="What are you after?">
+      <button class="btn btn--gold" type="submit">Search</button>
+    </form>
+
+    {%- if search.performed -%}
+      {%- if search.results_count > 0 -%}
+        <p class="sec__sub">{{ search.results_count }} result{% if search.results_count != 1 %}s{% endif %} for &ldquo;{{ search.terms | escape }}&rdquo;</p>
+        {%- paginate search.results by 24 -%}
+          <div class="grid">
+            {%- for item in search.results -%}
+              {%- if item.object_type == 'product' -%}
+                {% render 'product-card', product: item %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- if paginate.pages > 1 -%}
+            <nav class="pager" aria-label="Pagination">
+              {%- if paginate.previous -%}<a class="btn btn--ghost" href="{{ paginate.previous.url }}">Previous</a>{%- endif -%}
+              <span class="pager__n">Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+              {%- if paginate.next -%}<a class="btn btn--ghost" href="{{ paginate.next.url }}">Next</a>{%- endif -%}
+            </nav>
+          {%- endif -%}
+        {%- endpaginate -%}
+      {%- else -%}
+        <p class="sec__empty">Nothing matched &ldquo;{{ search.terms | escape }}&rdquo;. Try a shorter word.</p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Search"
+}
+{% endschema %}

@@ -1,0 +1,17 @@
+{%- comment -%}
+  Fetch target for the Section Rendering API, not something placed on a page.
+  theme.js requests /cart?section_id=cart-drawer-items after every cart change
+  and swaps the result into the drawer. The counts live on the wrapper as data
+  attributes so the JS never has to re-derive them.
+{%- endcomment -%}
+<div id="cart-render-root"
+     data-count="{{ cart.item_count }}"
+     data-subtotal="{{ cart.total_price | money }}">
+  {% render 'cart-items', cart: cart %}
+</div>
+
+{% schema %}
+{
+  "name": "Cart drawer items"
+}
+{% endschema %}

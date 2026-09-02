@@ -1,0 +1,138 @@
+<section class="hero">
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="wrap hero__in">
+
+    {%- if section.settings.kicker != blank -%}
+      <p class="hero__k">{{ section.settings.kicker | escape }}</p>
+    {%- endif -%}
+
+    <h1 class="hero__h">
+      {{ section.settings.heading | escape }}
+      {%- if section.settings.heading_accent != blank -%}
+        <span>{{ section.settings.heading_accent | escape }}</span>
+      {%- endif -%}
+    </h1>
+
+    {%- if section.settings.text != blank -%}
+      <p class="hero__p">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+
+    <div class="hero__cta">
+      {%- if section.settings.btn1_text != blank -%}
+        <a class="btn btn--gold" href="{{ section.settings.btn1_link | default: routes.all_products_collection_url }}">
+          {{ section.settings.btn1_text | escape }}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.btn2_text != blank -%}
+        <a class="btn btn--ghost" href="{{ section.settings.btn2_link | default: routes.root_url }}">
+          {{ section.settings.btn2_text | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_countdown -%}
+      <div class="cdown" id="cdown" data-month="{{ section.settings.cd_month }}" data-day="{{ section.settings.cd_day }}">
+        <div class="cdown__cell"><b id="cd-d">--</b><span>Days</span></div>
+        <div class="cdown__cell"><b id="cd-h">--</b><span>Hours</span></div>
+        <div class="cdown__cell"><b id="cd-m">--</b><span>Mins</span></div>
+        <div class="cdown__cell"><b id="cd-s">--</b><span>Secs</span></div>
+        <p class="cdown__lbl">{{ section.settings.cd_label | escape }}</p>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Small line above the heading",
+      "default": "Halloween 2026 &middot; Now shipping"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Make it a night they"
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading - coloured words",
+      "default": "won't forget"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Decor, costumes and party gear that actually looks good. Free US shipping, and everything lands before the 31st."
+    },
+    {
+      "type": "text",
+      "id": "btn1_text",
+      "label": "Button 1 text",
+      "default": "Shop everything"
+    },
+    {
+      "type": "url",
+      "id": "btn1_link",
+      "label": "Button 1 link"
+    },
+    {
+      "type": "text",
+      "id": "btn2_text",
+      "label": "Button 2 text",
+      "default": "Best sellers"
+    },
+    {
+      "type": "url",
+      "id": "btn2_link",
+      "label": "Button 2 link"
+    },
+    {
+      "type": "header",
+      "content": "Countdown"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_countdown",
+      "label": "Show the countdown",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "cd_month",
+      "label": "Month",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 10,
+      "info": "10 = October. The countdown rolls to next year by itself once the date passes."
+    },
+    {
+      "type": "range",
+      "id": "cd_day",
+      "label": "Day",
+      "min": 1,
+      "max": 31,
+      "step": 1,
+      "default": 31
+    },
+    {
+      "type": "text",
+      "id": "cd_label",
+      "label": "Label under the countdown",
+      "default": "Until Halloween &mdash; order early, stock does run out"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

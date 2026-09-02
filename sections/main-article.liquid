@@ -1,0 +1,19 @@
+<section class="sec sec--top">
+  <div class="wrap wrap--narrow">
+    <p class="sec__k">{{ article.published_at | date: '%B %-d, %Y' }}</p>
+    <h1 class="sec__h">{{ article.title }}</h1>
+
+    {%- if article.image -%}
+      <img class="art__hero" src="{{ article.image | image_url: width: 1200 }}"
+           alt="{{ article.image.alt | escape }}" width="1200" height="675" loading="eager">
+    {%- endif -%}
+
+    <div class="rte page__body">{{ article.content }}</div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Article"
+}
+{% endschema %}

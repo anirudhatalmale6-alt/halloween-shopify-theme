@@ -1,0 +1,45 @@
+{%- comment -%}
+  The cart line items. Deliberately ONE copy of this markup: the drawer renders
+  it on page load, and after any change the JS re-fetches the
+  `cart-drawer-items` section and swaps the result in. Building the same rows a
+  second time in JavaScript would be two implementations of one thing, and they
+  drift.
+{%- endcomment -%}
+
+{%- if cart.item_count == 0 -%}
+  <p class="cart__empty">Your cart is empty.<br>The good stuff sells out - go grab something.</p>
+{%- else -%}
+  {%- for item in cart.items -%}
+    <div class="ci" data-key="{{ item.key }}">
+      <a href="{{ item.url }}">
+        {%- if item.image -%}
+          <img src="{{ item.image | image_url: width: 160 }}" alt="{{ item.image.alt | escape }}" width="62" height="62" loading="lazy">
+        {%- else -%}
+          <img src="{{ 'no-image.svg' | asset_url }}" alt="" width="62" height="62" loading="lazy">
+        {%- endif -%}
+      </a>
+
+      <div class="ci__m">
+        <a class="ci__n" href="{{ item.url }}">{{ item.product.title }}</a>
+
+        {%- unless item.product.has_only_default_variant -%}
+          <p class="ci__var">{{ item.variant.title }}</p>
+        {%- endunless -%}
+
+        <p class="ci__p">{{ item.final_line_price | money }}</p>
+
+        {%- if item.original_line_price > item.final_line_price -%}
+          <p class="ci__was"><s>{{ item.original_line_price | money }}</s></p>
+        {%- endif -%}
+
+        <div class="ci__q">
+          <button type="button" data-ck="{{ item.key }}" data-to="{{ item.quantity | minus: 1 }}" aria-label="Decrease quantity">&minus;</button>
+          <b>{{ item.quantity }}</b>
+          <button type="button" data-ck="{{ item.key }}" data-to="{{ item.quantity | plus: 1 }}" aria-label="Increase quantity">&plus;</button>
+        </div>
+      </div>
+
+      <button class="ci__x" type="button" data-ck="{{ item.key }}" data-to="0" aria-label="Remove {{ item.product.title | escape }}">&times;</button>
+    </div>
+  {%- endfor -%}
+{%- endif -%}
