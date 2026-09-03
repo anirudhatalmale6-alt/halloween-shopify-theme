@@ -1,0 +1,134 @@
+{%- comment -%}
+  Category jump bar.
+
+  Sticks under the header, so a category is one tap away from any point on the
+  page - which is what "jump them to that category" has to mean once you are
+  four thousand pixels down on a phone.
+
+  Each block points at a "Collection row" section further down the SAME page.
+  The two are joined by the anchor id: type the same word in both and they are
+  linked. That is deliberately the only thing you have to keep in step, and
+  there is a warning in the theme editor if you leave it blank.
+
+  Scrolls horizontally on a phone rather than wrapping to three rows.
+{%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+  <nav class="chips" id="chips" aria-label="Jump to a category">
+    <div class="wrap chips__in">
+      {%- comment -%}
+        The first chip is a real link to the full catalogue, not an anchor.
+        There is no single "everything" section on this homepage any more -
+        the products are split across one section per category - so an
+        "#shop" anchor would have scrolled nowhere. Set an anchor below
+        instead if you would rather it jumped somewhere on the page.
+      {%- endcomment -%}
+      {%- liquid
+        assign all_href = section.settings.all_link
+        if all_href == blank and section.settings.all_anchor != blank
+          assign all_href = section.settings.all_anchor | handleize | prepend: '#'
+        endif
+        if all_href == blank
+          assign all_href = routes.all_products_collection_url
+        endif
+      -%}
+      {%- if section.settings.all_text != blank -%}
+        <a class="chip chip--all" href="{{ all_href }}">
+          {{ section.settings.all_text | escape }}
+        </a>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign label = block.settings.label
+          assign anchor = block.settings.anchor
+          if label == blank and block.settings.collection != blank
+            assign label = block.settings.collection.title
+          endif
+          if anchor == blank and block.settings.collection != blank
+            assign anchor = block.settings.collection.handle
+          endif
+        -%}
+        {%- if label != blank and anchor != blank -%}
+          <a class="chip" href="#{{ anchor | handleize }}" {{ block.shopify_attributes }}>
+            {{ label | escape }}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </nav>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Category jump bar",
+  "tag": "section",
+  "class": "shopify-section--chips",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add one block per category. Each one needs the SAME anchor word as the Collection row section it should jump to."
+    },
+    {
+      "type": "text",
+      "id": "all_text",
+      "label": "First chip",
+      "default": "All",
+      "info": "Leave blank to remove it."
+    },
+    {
+      "type": "url",
+      "id": "all_link",
+      "label": "First chip links to",
+      "info": "Leave empty for the all-products page."
+    },
+    {
+      "type": "text",
+      "id": "all_anchor",
+      "label": "...or an anchor on this page",
+      "info": "Used only when no link is set above."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "chip",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Picking one fills the label and the anchor for you."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label (overrides the collection name)"
+        },
+        {
+          "type": "text",
+          "id": "anchor",
+          "label": "Anchor (overrides the collection handle)",
+          "info": "Must match the anchor on the Collection row section below."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category jump bar",
+      "blocks": [
+        {
+          "type": "chip"
+        },
+        {
+          "type": "chip"
+        },
+        {
+          "type": "chip"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,4 +1,22 @@
-{%- if section.settings.show -%}
+{%- comment -%}
+  The two lines default to the shipping wording in Theme settings > Shipping
+  & guarantees, so the delivery promise is stated in ONE place and repeated
+  from there. Type something here and it overrides just this bar.
+{%- endcomment -%}
+{%- liquid
+  assign strong = section.settings.strong | default: settings.ship_announce_1
+  assign text = section.settings.text | default: settings.ship_announce_2
+  assign has_copy = false
+  if strong != blank or text != blank
+    assign has_copy = true
+  endif
+-%}
+{%- comment -%}
+  Two separate ifs, not `show and a or b`. Liquid has no operator precedence
+  and evaluates right to left, so a mixed and/or condition means something
+  other than what it reads like.
+{%- endcomment -%}
+{%- if section.settings.show and has_copy -%}
   <div class="ann" role="region" aria-label="Announcement">
     <p>
       {%- comment -%}
@@ -7,10 +25,10 @@
         "FREE US SHIPPINGON EVERY ORDER". An entity is not whitespace, so it
         survives the strip.
       {%- endcomment -%}
-      {%- if section.settings.strong != blank -%}
-        <strong>{{ section.settings.strong | escape }}</strong>&nbsp;
+      {%- if strong != blank -%}
+        <strong>{{ strong | escape }}</strong>&nbsp;
       {%- endif -%}
-      {{ section.settings.text | escape }}
+      {{ text | escape }}
     </p>
   </div>
 {%- endif -%}
@@ -26,16 +44,18 @@
       "default": true
     },
     {
+      "type": "paragraph",
+      "content": "Leave both boxes empty to use the wording in Theme settings > Shipping & guarantees, so the delivery promise is written in one place only."
+    },
+    {
       "type": "text",
       "id": "strong",
-      "label": "Highlighted words",
-      "default": "Free US shipping"
+      "label": "Highlighted words"
     },
     {
       "type": "text",
       "id": "text",
-      "label": "Message",
-      "default": "on every order &middot; Delivered before October 31st"
+      "label": "Message"
     }
   ]
 }

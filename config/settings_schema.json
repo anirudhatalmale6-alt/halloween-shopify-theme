@@ -138,6 +138,91 @@
         "id": "card_show_save_badge",
         "label": "Show the percentage saved when a product is on sale",
         "default": true
+      },
+      {
+        "type": "text",
+        "id": "add_to_cart_text",
+        "label": "Add button text",
+        "default": "Add to Cart"
+      }
+    ]
+  },
+  {
+    "name": "Shipping & guarantees",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Every delivery promise, guarantee and warehouse claim on the site is here, in one place. Change a line and it changes on the homepage, on every product page and in the cart at the same time. Empty a line and it disappears rather than leaving a gap."
+      },
+      {
+        "type": "paragraph",
+        "content": "Nothing here is enforced by the theme. If you promise 24-hour dispatch, that promise is yours to keep - so update these the day a supplier changes."
+      },
+      {
+        "type": "header",
+        "content": "Announcement bar"
+      },
+      {
+        "type": "text",
+        "id": "ship_announce_1",
+        "label": "Line 1",
+        "default": "FREE US SHIPPING ON EVERYTHING"
+      },
+      {
+        "type": "text",
+        "id": "ship_announce_2",
+        "label": "Line 2",
+        "default": "Order by Oct 20 and it lands before Halloween"
+      },
+      {
+        "type": "header",
+        "content": "Promises on every product page"
+      },
+      {
+        "type": "text",
+        "id": "ship_free",
+        "label": "Shipping",
+        "default": "Free US shipping, no minimum"
+      },
+      {
+        "type": "text",
+        "id": "ship_dispatch",
+        "label": "Dispatch time",
+        "default": "Ships within 24 hours from a US warehouse"
+      },
+      {
+        "type": "text",
+        "id": "ship_guarantee",
+        "label": "Delivery guarantee",
+        "default": "Guaranteed delivered before Oct 31 or it's free"
+      },
+      {
+        "type": "text",
+        "id": "ship_returns",
+        "label": "Returns",
+        "default": "30-day returns, no questions asked"
+      },
+      {
+        "type": "header",
+        "content": "Urgency"
+      },
+      {
+        "type": "text",
+        "id": "urgency_text",
+        "label": "Line under the stock bar",
+        "default": "Selling fast - limited stock left at this price",
+        "info": "Empty this to remove the urgency line everywhere at once."
+      },
+      {
+        "type": "header",
+        "content": "Ratings"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_use_fallback_rating",
+        "label": "Show a made-up rating on products that have no reviews",
+        "default": false,
+        "info": "Off, and it should stay off. With this on, a product with zero reviews displays the fallback rating below as though it were real. Ratings come from the reviews.rating metafield, which the products CSV fills in from the supplier's own listing."
       }
     ]
   },

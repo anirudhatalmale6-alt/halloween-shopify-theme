@@ -3,16 +3,21 @@
     "hero": {
       "type": "hero",
       "settings": {
-        "kicker": "Halloween 2026 · Now shipping",
-        "heading": "Make it a night they",
-        "heading_accent": "won't forget",
-        "text": "Decor, costumes and party gear that actually looks good. Free US shipping, and everything lands before the 31st.",
-        "btn1_text": "Shop everything",
-        "btn2_text": "Best sellers",
+        "kicker": "Halloween 2026 Collection",
+        "heading": "Haunt Your House.",
+        "heading_accent": "Ship It Free.",
+        "text": "Light-up masks, floating candles, yard ghosts and decor - shipped free anywhere in the US and guaranteed on your doorstep before October 31st.",
+        "tick1": "Free US shipping, no minimum",
+        "tick2": "Ships in 24 hours from a US warehouse",
+        "tick3": "Before Oct 31 or it's free",
+        "btn1_text": "Shop the Collection",
+        "btn2_text": "Browse Categories",
+        "btn2_link": "#cats",
+        "show_collage": true,
         "show_countdown": true,
         "cd_month": 10,
         "cd_day": 31,
-        "cd_label": "Until Halloween — order early, stock does run out"
+        "cd_label": "until Halloween"
       }
     },
     "trust": {
@@ -21,29 +26,29 @@
         "b1": {
           "type": "item",
           "settings": {
-            "title": "Free shipping",
-            "text": "On every US order"
+            "title": "Free US Shipping",
+            "text": "On every order, no minimum"
           }
         },
         "b2": {
           "type": "item",
           "settings": {
-            "title": "Ships in 24h",
-            "text": "Order today, out tomorrow"
+            "title": "Ships in 24 Hours",
+            "text": "Order by 3pm, out the same day"
           }
         },
         "b3": {
           "type": "item",
           "settings": {
-            "title": "30-day returns",
-            "text": "Changed your mind? Fine."
+            "title": "Delivered Before Oct 31",
+            "text": "Guaranteed or it's free"
           }
         },
         "b4": {
           "type": "item",
           "settings": {
-            "title": "Secure checkout",
-            "text": "Encrypted, every time"
+            "title": "30-Day Returns",
+            "text": "Unopened, no questions asked"
           }
         }
       },
@@ -54,53 +59,62 @@
         "b4"
       ]
     },
-    "featured": {
-      "type": "featured-products",
-      "settings": {
-        "kicker": "Selling fast",
-        "heading": "This year's best sellers",
-        "sub": "The pieces people keep coming back for.",
-        "count": 8,
-        "show_view_all": true,
-        "alt_bg": false,
-        "anchor": "shop"
-      }
-    },
     "categories": {
       "type": "categories",
       "settings": {
-        "kicker": "Browse",
-        "heading": "Shop by category",
+        "kicker": "Shop by",
+        "heading": "Categories",
+        "sub": "Tap a category to jump straight to it.",
         "alt_bg": true,
-        "anchor": "categories"
+        "anchor": "cats"
       },
       "blocks": {
         "c1": {
           "type": "cat",
           "settings": {
-            "title": "Decor",
-            "text": "Props, animatronics and everything for the porch"
+            "title": "LED Masks",
+            "text": "Light-up masks and gloves, the ones that sell on video",
+            "anchor": "cat-led-masks"
           }
         },
         "c2": {
           "type": "cat",
           "settings": {
-            "title": "Costumes",
-            "text": "For you, the kids and the dog"
+            "title": "Lights & Candles",
+            "text": "Floating candles, fairy lights, lamps and flames",
+            "anchor": "cat-lights-candles"
           }
         },
         "c3": {
           "type": "cat",
           "settings": {
-            "title": "Lighting",
-            "text": "Fog, projectors and things that glow"
+            "title": "Yard & Outdoor",
+            "text": "Ghosts, cobwebs, cauldrons and projectors",
+            "anchor": "cat-yard-outdoor"
           }
         },
         "c4": {
           "type": "cat",
           "settings": {
-            "title": "Party",
-            "text": "Tableware, games and the rest of the night"
+            "title": "Home & Decor",
+            "text": "Bats, rugs, bathroom sets and skeleton ornaments",
+            "anchor": "cat-home-decor"
+          }
+        },
+        "c5": {
+          "type": "cat",
+          "settings": {
+            "title": "Apparel",
+            "text": "Sweaters, cardigans, overalls and slippers",
+            "anchor": "cat-apparel"
+          }
+        },
+        "c6": {
+          "type": "cat",
+          "settings": {
+            "title": "Accessories",
+            "text": "Phone cases, magnets, pet collars and car decor",
+            "anchor": "cat-accessories"
           }
         }
       },
@@ -108,41 +122,179 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6"
       ]
+    },
+    "jump": {
+      "type": "category-nav",
+      "settings": {
+        "all_text": "All"
+      },
+      "blocks": {
+        "j1": {
+          "type": "chip",
+          "settings": {
+            "label": "LED Masks",
+            "anchor": "cat-led-masks"
+          }
+        },
+        "j2": {
+          "type": "chip",
+          "settings": {
+            "label": "Lights & Candles",
+            "anchor": "cat-lights-candles"
+          }
+        },
+        "j3": {
+          "type": "chip",
+          "settings": {
+            "label": "Yard & Outdoor",
+            "anchor": "cat-yard-outdoor"
+          }
+        },
+        "j4": {
+          "type": "chip",
+          "settings": {
+            "label": "Home & Decor",
+            "anchor": "cat-home-decor"
+          }
+        },
+        "j5": {
+          "type": "chip",
+          "settings": {
+            "label": "Apparel",
+            "anchor": "cat-apparel"
+          }
+        },
+        "j6": {
+          "type": "chip",
+          "settings": {
+            "label": "Accessories",
+            "anchor": "cat-accessories"
+          }
+        }
+      },
+      "block_order": [
+        "j1",
+        "j2",
+        "j3",
+        "j4",
+        "j5",
+        "j6"
+      ]
+    },
+    "cat1": {
+      "type": "collection-row",
+      "settings": {
+        "tag": "LED Masks",
+        "heading": "LED Masks",
+        "sub": "Light-up masks and gloves, the ones that sell on video",
+        "anchor": "cat-led-masks",
+        "count": 6,
+        "alt_bg": false,
+        "show_view_all": true,
+        "view_all_text": "See all"
+      }
+    },
+    "cat2": {
+      "type": "collection-row",
+      "settings": {
+        "tag": "Lights & Candles",
+        "heading": "Lights & Candles",
+        "sub": "Floating candles, fairy lights, lamps and flames",
+        "anchor": "cat-lights-candles",
+        "count": 12,
+        "alt_bg": true,
+        "show_view_all": true,
+        "view_all_text": "See all"
+      }
+    },
+    "cat3": {
+      "type": "collection-row",
+      "settings": {
+        "tag": "Yard & Outdoor",
+        "heading": "Yard & Outdoor",
+        "sub": "Ghosts, cobwebs, cauldrons and projectors",
+        "anchor": "cat-yard-outdoor",
+        "count": 8,
+        "alt_bg": false,
+        "show_view_all": true,
+        "view_all_text": "See all"
+      }
+    },
+    "cat4": {
+      "type": "collection-row",
+      "settings": {
+        "tag": "Home & Decor",
+        "heading": "Home & Decor",
+        "sub": "Bats, rugs, bathroom sets and skeleton ornaments",
+        "anchor": "cat-home-decor",
+        "count": 12,
+        "alt_bg": true,
+        "show_view_all": true,
+        "view_all_text": "See all"
+      }
+    },
+    "cat5": {
+      "type": "collection-row",
+      "settings": {
+        "tag": "Apparel",
+        "heading": "Apparel",
+        "sub": "Sweaters, cardigans, overalls and slippers",
+        "anchor": "cat-apparel",
+        "count": 7,
+        "alt_bg": false,
+        "show_view_all": true,
+        "view_all_text": "See all"
+      }
+    },
+    "cat6": {
+      "type": "collection-row",
+      "settings": {
+        "tag": "Accessories",
+        "heading": "Accessories",
+        "sub": "Phone cases, magnets, pet collars and car decor",
+        "anchor": "cat-accessories",
+        "count": 4,
+        "alt_bg": true,
+        "show_view_all": true,
+        "view_all_text": "See all"
+      }
     },
     "why": {
       "type": "why-us",
       "settings": {
         "kicker": "Why us",
-        "heading": "Halloween, done properly",
-        "text": "Anyone can sell a plastic pumpkin. We pick pieces that hold up on the night and look like you meant it.",
-        "btn_text": "Start shopping",
+        "heading": "Halloween has a deadline. We're built around it.",
+        "text": "Most stores treat October like any other month. We don't. Every order is picked and out the door within 24 hours, tracked end to end, and backed by a written guarantee: if it isn't on your doorstep by October 30th, you don't pay for it.",
+        "btn_text": "Start Shopping",
         "anchor": "why"
       },
       "blocks": {
         "p1": {
           "type": "point",
           "settings": {
-            "text": "Free shipping on every US order, no minimum"
+            "text": "US warehouse stock - not a 6-week boat from overseas"
           }
         },
         "p2": {
           "type": "point",
           "settings": {
-            "text": "Everything ships within 24 hours"
+            "text": "Live tracking from the moment your label is printed"
           }
         },
         "p3": {
           "type": "point",
           "settings": {
-            "text": "Ordered before October 24th? It arrives in time"
+            "text": "Damaged in transit? Photo it, we reship the same day"
           }
         },
         "p4": {
           "type": "point",
           "settings": {
-            "text": "30-day returns, no interrogation"
+            "text": "Real humans on chat 7 days a week through October"
           }
         }
       },
@@ -156,8 +308,12 @@
     "reviews": {
       "type": "reviews",
       "settings": {
-        "kicker": "Reviews",
-        "heading": "What people said",
+        "kicker": "Product reviews",
+        "heading": "What buyers say about these products",
+        "avg": "4.4",
+        "total": "13965",
+        "total_label": "verified product reviews across the collection",
+        "note": "Reviews left by verified buyers of these products. Product reviews, not store reviews - once your own orders start coming in, a reviews app replaces these with yours.",
         "alt_bg": true,
         "anchor": "reviews"
       },
@@ -165,9 +321,9 @@
         "r1": {
           "type": "review",
           "settings": {
-            "quote": "Turned up three days after I ordered and the quality is way past what I paid. Neighbours have asked where it came from twice.",
-            "name": "Danielle R.",
-            "place": "Philadelphia, PA",
+            "quote": "Comfort: 10000/10 Warmth: 1000/10 Ease of Cleaning: 300000/10 It literally is soooooo fluffy and soft I love it so much it’s the perfect amount of warm and is long enough to go down to your ankles.",
+            "name": "E**s",
+            "place": "Oversized Pumpkin Blanket Hoodie",
             "rating": 5,
             "verified": true
           }
@@ -175,9 +331,9 @@
         "r2": {
           "type": "review",
           "settings": {
-            "quote": "I have bought Halloween stuff online for years and most of it is junk. This is the first time I would order again without thinking about it.",
-            "name": "Marcus T.",
-            "place": "Austin, TX",
+            "quote": "Fabulous purchase! The sweater is extremely soft and looks exactly like it is advertised. I’m 5’8” and about 150 pounds (muscular gal 🙂‍↕️) and it fits as the perfect oversized sweater. Definitely recommend for a fun fall vibe!",
+            "name": "Verified buyer",
+            "place": "Distressed Skull Drop-Shoulder Sweater",
             "rating": 5,
             "verified": true
           }
@@ -185,9 +341,39 @@
         "r3": {
           "type": "review",
           "settings": {
-            "quote": "Ordered late and still had it before the weekend. Kids lost their minds.",
-            "name": "Priya S.",
-            "place": "Chicago, IL",
+            "quote": "These trees are easy to assemble. They come with small pumpkins you can put over the lights if you choose to. You can put batteries in it or you can use the plug enclosed with it. It’s a great addition to my Halloween decorations!",
+            "name": "N**i",
+            "place": "24in Orange & Purple LED Tree, 2 Pack",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "quote": "So cool. But very fragile. But they kicked us off this year for Holloween now we got all sorts of decorations. But these are pretty cool for sure. They would be a nice addition to any place.",
+            "name": "R**",
+            "place": "Sitting Skeleton Resin Ornament",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "r5": {
+          "type": "review",
+          "settings": {
+            "quote": "If you want an easy way to make your home feel Halloween-ready, these bat lights are such a cute decoration! 🦇🎃 I love how the little bats add that spooky touch without being too scary. They’re perfect for decorating a wall, window, porch, or even a Halloween party setup. ✨🖤 Definitely an easy way to make your space feel festive!",
+            "name": "s**_",
+            "place": "Light-Up 3D Bat Wall Decals",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "r6": {
+          "type": "review",
+          "settings": {
+            "quote": "great fit and soft material. wearing my regular size and it’s not too baggy or too small Warmth: comfy warm Fit & Size: regular size Fabric & Comfort: stretchy and soft",
+            "name": "p**e **",
+            "place": "Black Skeleton Print Cardigan",
             "rating": 5,
             "verified": true
           }
@@ -196,14 +382,17 @@
       "block_order": [
         "r1",
         "r2",
-        "r3"
+        "r3",
+        "r4",
+        "r5",
+        "r6"
       ]
     },
     "newsletter": {
       "type": "newsletter",
       "settings": {
         "heading": "Get 10% off your first order",
-        "text": "One email when something good lands. No daily nonsense.",
+        "text": "One email when the new drops land. Nothing else, and you can leave any time.",
         "anchor": "newsletter"
       }
     },
@@ -218,29 +407,36 @@
         "q1": {
           "type": "qa",
           "settings": {
-            "q": "How long does delivery take?",
-            "a": "<p>Orders leave within 24 hours and most US addresses see them in 3 to 6 days. Order before October 24th and it will be with you for the 31st.</p>"
+            "q": "Will it arrive before Halloween?",
+            "a": "<p>Yes. Every order placed before October 20th is guaranteed to land on your doorstep by October 30th, or we refund you in full and you keep the item.</p>"
           }
         },
         "q2": {
           "type": "qa",
           "settings": {
-            "q": "Is shipping really free?",
-            "a": "<p>Yes, on every US order, with no minimum spend.</p>"
+            "q": "How much is shipping?",
+            "a": "<p>Nothing. Shipping is free on every order in the continental US, with no minimum spend. Alaska, Hawaii and Canada are a flat $7.95.</p>"
           }
         },
         "q3": {
           "type": "qa",
           "settings": {
-            "q": "What if I do not like it?",
-            "a": "<p>Send it back within 30 days for a full refund. You do not have to explain yourself.</p>"
+            "q": "Can I return something?",
+            "a": "<p>Anything unopened can come back within 30 days for a full refund. If an item arrives damaged, send us a photo and we ship a replacement the same day - no return needed.</p>"
           }
         },
         "q4": {
           "type": "qa",
           "settings": {
-            "q": "Is checkout secure?",
-            "a": "<p>Checkout runs on Shopify with full encryption. We never see your card details.</p>"
+            "q": "Do the light-up items come with batteries?",
+            "a": "<p>The rechargeable pieces - the hero masks, the under-cabinet bars and the pumpkin night light - arrive charged with a USB-C cable in the box. The battery-powered decorations take standard AA or AAA cells, which are not included.</p>"
+          }
+        },
+        "q5": {
+          "type": "qa",
+          "settings": {
+            "q": "Do you ship outside the US?",
+            "a": "<p>We ship to Canada, the UK, Ireland and Australia. Delivery runs 6-10 days, so international orders should go in before October 15th.</p>"
           }
         }
       },
@@ -248,15 +444,22 @@
         "q1",
         "q2",
         "q3",
-        "q4"
+        "q4",
+        "q5"
       ]
     }
   },
   "order": [
     "hero",
     "trust",
-    "featured",
     "categories",
+    "jump",
+    "cat1",
+    "cat2",
+    "cat3",
+    "cat4",
+    "cat5",
+    "cat6",
     "why",
     "reviews",
     "newsletter",

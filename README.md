@@ -7,19 +7,40 @@ No frameworks and no build step — plain Liquid, one stylesheet, one script.
 
 ## What you get
 
-**A homepage** with a hero, a live countdown to October 31st that rolls over by
-itself each year, a trust bar, a product grid, category tiles, a reasons-to-buy
-block, reviews, an email capture that writes real Shopify customers, and an FAQ.
+**A homepage** built to convert:
+
+- A hero with five real product photographs beside the offer, so the answer to
+  "what does this shop sell" is visible before a word is read. Any of the five
+  can be swapped in the theme editor.
+- An oversized "Shop the Collection" button as the single main call to action.
+- A live countdown to October 31st that rolls over by itself each year.
+- A trust bar.
+- Six category tiles that **scroll down this page** rather than loading a
+  separate one.
+- A sticky category jump bar that follows you down, with the category you are
+  currently in highlighted.
+- **One product section per category**, each with its own heading, count and
+  anchor. A category with no products removes itself, and anything pointing at
+  it hides rather than becoming a link to nowhere.
+- A reasons-to-buy block, a reviews section with room for customer photos and
+  video, an email capture that writes real Shopify customers, and an FAQ.
+
 Every one of those is a section you can reorder, edit or delete in the theme
 editor without touching code.
 
 **A landing page for every product**, generated from the one template:
 
 - Gallery with thumbnails
-- Buy box: title, rating, price, compare-at price, savings badge
+- Buy box: title, star rating linked to the reviews, price, compare-at price,
+  savings badge, units sold
 - Benefit bullets
 - Variant picker (size, colour, whatever you set up)
 - Quantity stepper
+- **Add to Cart and Buy It Now.** Buy It Now adds the item and goes straight to
+  checkout. It is a plain button rather than Shopify's dynamic checkout button
+  on purpose: the dynamic one only appears when accelerated checkout is enabled
+  AND the shopper's browser offers a wallet, so on a new store it is often
+  simply absent. Shop Pay and PayPal can be switched on underneath it.
 - Low-stock bar, which only appears when Shopify is genuinely tracking that
   variant's inventory, so it can never show a number you cannot back up
 - Feature cards, specification table, what's-in-the-box
@@ -37,10 +58,18 @@ customer accounts, a gift-card page, a 404 and a password page.
 descriptions, three benefit bullets each, categories and 54 supplier photos.
 One import creates the lot.
 
-The price column is blank on 51 of them, on purpose. TikTok Shop puts the
-price behind a captcha, and the selling price is your margin decision rather
-than a number to copy. Fill that column in before importing - a blank price
-imports as $0.00, which looks like a working price.
+**22 have a verified price**, each read off the supplier's own pages and then
+checked against a second, independent source. **15 are products the supplier no
+longer lists** — they import as drafts so they cannot go on sale by accident.
+**15 need a price from you.**
+
+**32 carry a real star rating and review count** — 13,965 reviews between them,
+all read off the supplier's own listing for that exact product. The other 20
+have no rating and the theme shows no stars for them. There is no fallback
+rating: the setting that would invent one is off, and labelled for what it is.
+
+Fill the price column in before importing — a blank price imports as $0.00,
+which looks like a working price.
 
 See `SETUP.md` step 4.
 
@@ -54,6 +83,18 @@ rather than left empty.
 Written detail is an upgrade, never a thing that blocks you from launching.
 Fill the metafields in later, product by product, and each page gets richer on
 its own. See `SETUP.md` for the optional fields.
+
+## One place for the delivery promises
+
+Every shipping time, dispatch claim, delivery guarantee, returns promise and
+urgency line is in **Theme settings → Shipping & guarantees**. Change one line
+there and it changes on the homepage, in the announcement bar, on all 52
+product pages and in the cart at once.
+
+Those are the claims that get a store in trouble when they go stale, so they
+are the ones that must be trivial to correct the day a supplier changes.
+Nothing in them is enforced by the theme — if you promise 24-hour dispatch,
+that promise is yours to keep.
 
 ## Editing
 

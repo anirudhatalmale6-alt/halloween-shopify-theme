@@ -34,8 +34,24 @@
     endfor
   endif
 
-  assign rating = product.metafields.reviews.rating.value.rating | default: settings.card_fallback_rating
+  comment
+    NO fallback rating.
+
+    This used to be `| default: settings.card_fallback_rating`, which was 4.8
+    out of the box - so every product with no reviews at all displayed 4.8
+    stars. That is not a placeholder, it is a claim, and it is the shop owner's
+    name against it. The setting still exists so it can be turned on
+    deliberately, but it is off by default and it is never the silent answer.
+
+    The real ratings now come from the reviews.rating metafield, which the
+    products CSV fills in from the supplier's own listing for each product.
+  endcomment
+  assign rating = product.metafields.reviews.rating.value.rating
+  if rating == blank and settings.card_use_fallback_rating
+    assign rating = settings.card_fallback_rating
+  endif
   assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  assign sold = product.metafields.custom.sold_count.value
 
   assign simple = false
   if product.has_only_default_variant or product.variants.size == 1
@@ -68,15 +84,26 @@
   </a>
 
   <div class="card__body">
+    {%- comment -%}
+      The row is rendered EMPTY when there is no rating, not omitted. It has a
+      fixed height in CSS, so titles line up across a row of four whether or
+      not every product has reviews. Dropping the element pulled unrated cards
+      22px up and made the grid look misaligned rather than incomplete.
+    {%- endcomment -%}
     {%- if settings.card_show_rating -%}
-      <div class="card__rating">
-        {%- if rating_count > 0 -%}
-          {%- capture rc -%}({% render 'thousands', n: rating_count %}){%- endcapture -%}
-          {% render 'stars', rating: rating, count: rc %}
-        {%- else -%}
-          {% render 'stars', rating: rating %}
-        {%- endif -%}
-      </div>
+      {%- if rating != blank -%}
+        <div class="card__rating">
+          {%- if rating_count > 0 -%}
+            {%- capture rc -%}({% render 'thousands', n: rating_count %}){%- endcapture -%}
+            {% render 'stars', rating: rating, count: rc %}
+          {%- else -%}
+            {% render 'stars', rating: rating %}
+          {%- endif -%}
+          <span class="card__rval">{{ rating | round: 1 }}</span>
+        </div>
+      {%- else -%}
+        <div class="card__rating card__rating--none"></div>
+      {%- endif -%}
     {%- endif -%}
 
     <h3 class="card__name"><a href="{{ product.url }}">{{ product.title }}</a></h3>
@@ -88,6 +115,10 @@
       {%- endif -%}
     {%- endif -%}
 
+    {%- if sold != blank and sold > 0 -%}
+      <p class="card__sold">{% render 'thousands', n: sold %}+ sold</p>
+    {%- endif -%}
+
     <div class="card__foot">
       <div class="card__price">
         <span class="price">{{ v.price | money }}</span>
@@ -96,12 +127,20 @@
         {%- endif -%}
       </div>
 
+      {%- comment -%}
+        "Add to Cart" in full rather than "Add" - the client asked for a
+        prominent add button and a three-letter one does not read as one.
+        A product with real options still goes to its page: a card cannot pick
+        a variant, and guessing the first one is how people get the wrong size.
+      {%- endcomment -%}
       {%- if product.available == false -%}
         <button class="btn btn--add" type="button" disabled>Sold out</button>
       {%- elsif simple -%}
-        <button class="btn btn--add js-add" type="button" data-vid="{{ v.id }}">Add</button>
+        <button class="btn btn--add js-add" type="button" data-vid="{{ v.id }}">
+          {{ settings.add_to_cart_text | default: 'Add to Cart' }}
+        </button>
       {%- else -%}
-        <a class="btn btn--add" href="{{ product.url }}">Choose</a>
+        <a class="btn btn--add" href="{{ product.url }}">Choose options</a>
       {%- endif -%}
     </div>
   </div>

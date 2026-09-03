@@ -84,6 +84,32 @@ so the images become yours - they do not stay linked to anywhere else.
 You can split the file and import in batches. Do ten, look at the store, then
 do the rest.
 
+### Star ratings and review counts come in with the CSV
+
+Three extra columns carry them:
+
+| Column | What it is |
+|---|---|
+| `Product Metafield: reviews.rating [rating]` | the star rating |
+| `Product Metafield: reviews.rating_count [number_integer]` | how many reviews |
+| `Product Metafield: custom.sold_count [number_integer]` | units sold |
+
+**32 of the 52 products have a real rating**, 13,965 reviews between them.
+Every one of those figures was read off the supplier's own listing for that
+exact product. The other 20 have the cells empty, and the theme then shows no
+stars for them at all — there is no fallback rating, and the switch that would
+turn one on is off and labelled for what it is.
+
+`reviews.rating` is the standard namespace every Shopify reviews app reads and
+writes, so installing Judge.me or Loox later takes these over rather than
+fighting them.
+
+One thing to be clear about: these are reviews of the **product**, from the
+supplier's listing. They are not reviews of your store. The reviews section on
+the homepage says so in a line underneath, and you should leave that line there
+until your own orders start producing reviews. Quoting a product review is
+normal; presenting it as your own customer is not.
+
 ### Every product has photos
 
 All 52 arrive with the supplier's own photographs — 58 images in total. The
@@ -135,7 +161,36 @@ per type and they fill themselves:
 | Accessories | Product type is equal to `Accessories` | 4 |
 
 Anything you import later joins on its own, as long as you set the same type.
-Then point the category tiles at them in the theme editor.
+
+**You can skip this at launch if you want to.** The homepage already splits the
+products into one section per category by matching the product **tag**, which
+the import sets to the same word. So the moment the CSV finishes, the homepage
+is full and the category jump links work. Making the collections properly gives
+you a real `/collections/apparel` page and a "See all" button on each row, which
+is worth doing — just not before you can look at the shop.
+
+If you do make them, open each **Collection row** section in the theme editor
+and pick the collection. It takes precedence over the tag.
+
+---
+
+## 5b. How the homepage category sections fit together
+
+There are three pieces and they are joined by one word, the **anchor**:
+
+| Piece | Where | What it holds |
+|---|---|---|
+| Category tiles | one section near the top | the six picture tiles |
+| Category jump bar | the sticky strip under the header | the six chips |
+| Collection row | six separate sections lower down | the products |
+
+A tile and a chip both carry an **anchor** box; a Collection row carries the
+matching **anchor**. Type `cat-apparel` in all three and clicking either one
+scrolls to that row. They are already set up this way — you only need this if
+you add a seventh category.
+
+Anything pointing at a section that is not on the page hides itself, so an
+emptied category cannot leave a chip that scrolls nowhere.
 
 ---
 
@@ -218,7 +273,11 @@ Shopify suspension or a frozen payout.
 | Colours, logo, cart style | Online Store → Themes → Customize → Theme settings |
 | Homepage layout and text | Customize, with the homepage selected |
 | Product page layout | Customize, then switch the top dropdown to Products |
-| Announcement bar | Customize → Announcement bar |
+| Announcement bar | Customize → Announcement bar (or leave it empty and use the settings below) |
+| **Shipping, delivery and guarantee wording** | **Customize → Theme settings → Shipping & guarantees** |
 | Countdown date | Customize → Hero → Countdown |
+| Hero photos | Customize → Hero → Product photos |
+| Buy It Now button | Customize → Products → Buy buttons |
+| Reviews and customer photos | Customize → Reviews |
 | Menus | Online Store → Navigation |
 | Product text and photos | Products |

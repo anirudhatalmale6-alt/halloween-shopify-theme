@@ -1,0 +1,163 @@
+{%- comment -%}
+  One category's products, on the homepage, under its own heading and anchor.
+
+  This is the section the jump bar points at. Add one per category.
+
+  Products come from, in order:
+    1. the collection you picked
+    2. every product carrying the tag you typed - so it works straight after a
+       CSV import, before any collections have been made
+    3. nothing, and the section removes itself rather than printing an empty
+       heading
+
+  Fallback 2 matters more than it looks. A freshly uploaded theme with no
+  collections configured renders as a broken shop rather than an unconfigured
+  one, and nobody sees that until the client is the one looking at it.
+{%- endcomment -%}
+
+{%- liquid
+  assign col = section.settings.collection
+  assign anchor = section.settings.anchor
+  if anchor == blank and col != blank
+    assign anchor = col.handle
+  endif
+  assign heading = section.settings.heading
+  if heading == blank and col != blank
+    assign heading = col.title
+  endif
+
+  assign limit = section.settings.count | default: 8
+  assign total = col.products_count | default: 0
+-%}
+
+{%- capture rows -%}
+  {%- if col != blank -%}
+    {%- for product in col.products limit: limit -%}
+      {% render 'product-card', product: product %}
+    {%- endfor -%}
+  {%- elsif section.settings.tag != blank -%}
+    {%- liquid
+      assign want = section.settings.tag | downcase | strip
+      assign shown = 0
+      assign found = 0
+    -%}
+    {%- for product in collections.all.products -%}
+      {%- assign hit = false -%}
+      {%- for t in product.tags -%}
+        {%- comment -%} Filters cannot run inside an `if` condition in Liquid -
+        `if t | downcase == want` is a parse error, not a comparison. Normalise
+        into a variable first. {%- endcomment -%}
+        {%- assign tt = t | downcase | strip -%}
+        {%- if tt == want -%}{%- assign hit = true -%}{%- break -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if hit -%}
+        {%- assign found = found | plus: 1 -%}
+        {%- if shown < limit -%}
+          {%- assign shown = shown | plus: 1 -%}
+          {% render 'product-card', product: product %}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if rows contains 'class="card' -%}
+  {%- liquid
+    if col == blank
+      assign total = found
+    endif
+  -%}
+  <section class="sec sec--cat{% if section.settings.alt_bg %} sec--alt{% endif %}"
+           id="{{ anchor | handleize }}">
+    <div class="wrap">
+      <div class="cathd">
+        <div>
+          {%- if heading != blank -%}<h2 class="cathd__h">{{ heading | escape }}</h2>{%- endif -%}
+          {%- if section.settings.sub != blank -%}<p class="cathd__s">{{ section.settings.sub | escape }}</p>{%- endif -%}
+        </div>
+        {%- if total > 0 -%}
+          <span class="cathd__n">{{ total }} product{% if total != 1 %}s{% endif %}</span>
+        {%- endif -%}
+      </div>
+
+      <div class="grid">{{ rows }}</div>
+
+      {%- if section.settings.show_view_all and col != blank and total > limit -%}
+        <p class="cat__more">
+          <a class="btn btn--ghost" href="{{ col.url }}">
+            {{ section.settings.view_all_text | default: 'See all' | escape }} {{ heading | escape }}
+          </a>
+        </p>
+      {%- endif -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection row",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "tag",
+      "label": "...or a product tag",
+      "info": "Used only when no collection is picked. Works straight after a CSV import, before you have made any collections."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Leave blank to use the collection name."
+    },
+    {
+      "type": "text",
+      "id": "sub",
+      "label": "Line under the heading"
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor",
+      "info": "The jump bar chip must point at this same word. Leave blank to use the collection handle."
+    },
+    {
+      "type": "range",
+      "id": "count",
+      "label": "Products to show",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show a \"see all\" button when there are more",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "\"See all\" text",
+      "default": "See all"
+    },
+    {
+      "type": "checkbox",
+      "id": "alt_bg",
+      "label": "Darker background",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection row"
+    }
+  ]
+}
+{% endschema %}

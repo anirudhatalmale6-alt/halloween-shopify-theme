@@ -10,8 +10,30 @@
 
     <div class="cats">
       {%- for block in section.blocks -%}
-        {%- assign c = block.settings.collection -%}
-        <a class="cat rv" href="{% if c != blank %}{{ c.url }}{% else %}{{ block.settings.link | default: routes.all_products_collection_url }}{% endif %}" {{ block.shopify_attributes }}>
+        {%- comment -%}
+          The anchor wins over the collection URL. That is the whole point of
+          this pass: clicking Apparel should scroll to the apparel products
+          further down THIS page, not load a separate collection page. Clear
+          the anchor on a tile and it goes back to linking to the collection.
+
+          It is a plain text setting, not a `url` one - Shopify's URL picker
+          will not accept "#cat-apparel".
+        {%- endcomment -%}
+        {%- liquid
+          assign c = block.settings.collection
+          assign href = ''
+          if block.settings.anchor != blank
+            assign href = block.settings.anchor | handleize | prepend: '#'
+          elsif c != blank
+            assign href = c.url
+          elsif block.settings.link != blank
+            assign href = block.settings.link
+          else
+            assign href = routes.all_products_collection_url
+          endif
+          assign count = c.products_count
+        -%}
+        <a class="cat rv" href="{{ href }}" {{ block.shopify_attributes }}>
           {%- if block.settings.image != blank -%}
             <img src="{{ block.settings.image | image_url: width: 240 }}"
                  alt="{{ block.settings.title | escape }}" width="240" height="240" loading="lazy">
@@ -26,6 +48,9 @@
             <h3>{{ block.settings.title | default: c.title | escape }}</h3>
             {%- if block.settings.text != blank -%}
               <p>{{ block.settings.text | escape }}</p>
+            {%- endif -%}
+            {%- if count > 0 -%}
+              <span class="cat__n">{{ count }} product{% if count != 1 %}s{% endif %}</span>
             {%- endif -%}
           </div>
         </a>
@@ -96,10 +121,16 @@
           "label": "Short description"
         },
         {
+          "type": "text",
+          "id": "anchor",
+          "label": "Jump to a section on this page",
+          "info": "e.g. cat-apparel. Must match the anchor on the Collection row section further down. Overrides the collection link - clear it to link to the collection page instead."
+        },
+        {
           "type": "url",
           "id": "link",
           "label": "Link",
-          "info": "Only used when no collection is chosen."
+          "info": "Only used when there is no anchor and no collection."
         }
       ]
     }

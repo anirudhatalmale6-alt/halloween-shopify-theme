@@ -21,6 +21,9 @@ import build  # noqa: E402
 # spreadsheet with every price blank while reporting itself as fine - the same
 # trap the page audit fell into, from the same cause.
 build.load_prices()
+# Ratings and review counts live in social.csv, and they are exported as
+# Shopify metafields so the theme's star rows have something real to read.
+build.load_social()
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -42,6 +45,17 @@ HEADERS = [
     "Variant Requires Shipping", "Variant Taxable",
     "Image Src", "Image Position", "Image Alt Text",
     "SEO Title", "SEO Description", "Status",
+    # Shopify's product importer writes metafields when the column is named
+    # exactly like this. `reviews.rating` / `reviews.rating_count` is the
+    # standard namespace every reviews app reads and writes, so a real reviews
+    # app installed later takes these over instead of fighting them.
+    #
+    # The rating type is `rating`, whose value is a JSON object carrying its
+    # own scale. A bare "4.5" in this column imports as nothing at all - it
+    # does not error, the field is simply empty afterwards.
+    "Product Metafield: reviews.rating [rating]",
+    "Product Metafield: reviews.rating_count [number_integer]",
+    "Product Metafield: custom.sold_count [number_integer]",
 ]
 
 
@@ -82,6 +96,13 @@ def product_rows(p):
     storefront the moment the file is uploaded.
     """
     gone = p["slug"] in catalog.UNAVAILABLE
+    # A rating is only written when the supplier published one. No fallback,
+    # no default - a product with no reviews imports with an empty metafield
+    # and the theme then renders no stars at all for it.
+    rating = ""
+    if p.get("rating"):
+        rating = ('{"scale_min":"1.0","scale_max":"5.0","value":"'
+                  + f'{p["rating"]:.1f}' + '"}')
     rows = [row(
         Handle=p["slug"],
         Title=p["name"],
@@ -110,6 +131,11 @@ def product_rows(p):
             "Image Alt Text": p["name"],
             "SEO Title": f"{p['name']} | Free US Shipping Before Halloween"[:70],
             "SEO Description": p["blurb"][:320],
+            "Product Metafield: reviews.rating [rating]": rating,
+            "Product Metafield: reviews.rating_count [number_integer]":
+                str(p["reviews"]) if p.get("reviews") else "",
+            "Product Metafield: custom.sold_count [number_integer]":
+                str(p["sold"]) if p.get("sold") else "",
         },
     )]
     for i in range(1, len(p["images"])):
@@ -137,7 +163,10 @@ def main():
     nophoto = [p["slug"] for p in catalog.PRODUCTS if not p["images"]]
     print(f"products-import.csv: {len(catalog.PRODUCTS)} products, {len(rows)} rows")
     print(f"  {len(unpriced)} with no price yet")
+    rated = [p for p in catalog.PRODUCTS if p.get("rating")]
     print(f"  {len(nophoto)} with no photo: {nophoto}")
+    print(f"  {len(rated)} carrying a real supplier rating "
+          f"({sum(p.get('reviews') or 0 for p in rated):,} reviews in total)")
 
 
 if __name__ == "__main__":

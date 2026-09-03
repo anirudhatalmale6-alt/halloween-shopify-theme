@@ -1,3 +1,21 @@
+{%- comment -%}
+  Social proof block.
+
+  Every block is a real review of a real product, and each one carries an
+  optional photo and an optional short video. The photo/video slots are empty
+  today and the markup collapses when they are - so a customer photo can be
+  dropped in later without anyone touching this file.
+
+  The three testimonials that used to be the preset here were written by me,
+  back when the products in this theme were invented too. They are gone. A
+  fabricated review on a live store is not a placeholder, it is a false claim
+  about a customer who does not exist, and it is the shop owner's name on it.
+  What is in the preset now came off the supplier's own listings.
+
+  Wording matters: this says buyers said it about the PRODUCT, not about this
+  store. Those are different claims and only one of them is true yet.
+{%- endcomment -%}
+
 <section class="sec {% if section.settings.alt_bg %}sec--alt{% endif %}" id="{{ section.settings.anchor | default: 'reviews' }}">
   <div class="wrap">
     {%- if section.settings.kicker != blank -%}
@@ -8,21 +26,62 @@
       <p class="sec__sub">{{ section.settings.sub | escape }}</p>
     {%- endif -%}
 
+    {%- comment -%}
+      `!= blank`, not `> 0`. These are text settings so they can be left empty,
+      and comparing a string to a number in Liquid is silently false - the
+      summary line would simply never have rendered.
+    {%- endcomment -%}
+    {%- if section.settings.avg != blank and section.settings.total != blank -%}
+      <p class="revs__sum">
+        {% render 'stars', rating: section.settings.avg %}
+        <b>{{ section.settings.avg }}</b> average from
+        <b>{% render 'thousands', n: section.settings.total %}</b>
+        {{ section.settings.total_label | escape }}
+      </p>
+    {%- endif -%}
+
     <div class="revs">
       {%- for block in section.blocks -%}
         <figure class="rev rv" {{ block.shopify_attributes }}>
           <div class="rev__stars">{% render 'stars', rating: block.settings.rating %}</div>
+          {%- if block.settings.title != blank -%}
+            <strong class="rev__t">{{ block.settings.title | escape }}</strong>
+          {%- endif -%}
           <blockquote>{{ block.settings.quote | escape }}</blockquote>
+
+          {%- comment -%} Video wins over photo when both are set. {%- endcomment -%}
+          {%- if block.settings.video != blank -%}
+            <div class="rev__vid">
+              {{ block.settings.video | video_tag: image_size: '600x', controls: true, muted: true, playsinline: true }}
+            </div>
+          {%- elsif block.settings.photo != blank -%}
+            <img class="rev__img"
+                 src="{{ block.settings.photo | image_url: width: 600 }}"
+                 srcset="{{ block.settings.photo | image_url: width: 400 }} 400w,
+                         {{ block.settings.photo | image_url: width: 800 }} 800w"
+                 sizes="(max-width:860px) 90vw, 360px"
+                 alt="{{ block.settings.photo.alt | default: 'Customer photo' | escape }}"
+                 loading="lazy" width="600" height="450">
+          {%- endif -%}
+
           <figcaption>
-            <strong>{{ block.settings.name | escape }}</strong>
-            <span>{{ block.settings.place | escape }}</span>
+            <strong>{{ block.settings.name | default: 'Verified buyer' | escape }}</strong>
+            {%- if block.settings.product != blank -%}
+              <a class="rev__of" href="{{ block.settings.product.url }}">on {{ block.settings.product.title }}</a>
+            {%- elsif block.settings.place != blank -%}
+              <span class="rev__of">{{ block.settings.place | escape }}</span>
+            {%- endif -%}
             {%- if block.settings.verified -%}
-              <span class="rev__v">Verified buyer</span>
+              <span class="rev__v">Verified purchase</span>
             {%- endif -%}
           </figcaption>
         </figure>
       {%- endfor -%}
     </div>
+
+    {%- if section.settings.note != blank -%}
+      <p class="revs__note">{{ section.settings.note | escape }}</p>
+    {%- endif -%}
   </div>
 </section>
 
@@ -35,18 +94,50 @@
       "type": "text",
       "id": "kicker",
       "label": "Small line above the heading",
-      "default": "Reviews"
+      "default": "Product reviews"
     },
     {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "What people said"
+      "default": "What buyers say about these products"
     },
     {
       "type": "textarea",
       "id": "sub",
       "label": "Text under the heading"
+    },
+    {
+      "type": "header",
+      "content": "Summary line"
+    },
+    {
+      "type": "text",
+      "id": "avg",
+      "label": "Average rating",
+      "info": "Leave empty to hide the summary line. Only fill this in if it is true - it is a claim about your whole catalogue."
+    },
+    {
+      "type": "text",
+      "id": "total",
+      "label": "Total number of reviews"
+    },
+    {
+      "type": "text",
+      "id": "total_label",
+      "label": "Words after the number",
+      "default": "verified product reviews across the collection"
+    },
+    {
+      "type": "header",
+      "content": "Small print"
+    },
+    {
+      "type": "textarea",
+      "id": "note",
+      "label": "Note under the reviews",
+      "default": "Reviews left by verified buyers of these products. Product reviews, not store reviews - once your own orders start coming in, a reviews app replaces these with yours.",
+      "info": "Keep a line like this while the reviews are the supplier's rather than your own customers'. It is the difference between quoting a review and claiming a customer."
     },
     {
       "type": "checkbox",
@@ -73,13 +164,25 @@
         },
         {
           "type": "text",
+          "id": "title",
+          "label": "Headline (optional)"
+        },
+        {
+          "type": "text",
           "id": "name",
-          "label": "Name"
+          "label": "Name",
+          "info": "Leave blank for 'Verified buyer'."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product this review is about"
         },
         {
           "type": "text",
           "id": "place",
-          "label": "Location"
+          "label": "Location",
+          "info": "Only used when no product is chosen."
         },
         {
           "type": "range",
@@ -93,41 +196,30 @@
         {
           "type": "checkbox",
           "id": "verified",
-          "label": "Show 'verified buyer'",
+          "label": "Show 'verified purchase'",
           "default": true
+        },
+        {
+          "type": "header",
+          "content": "Customer photo or video"
+        },
+        {
+          "type": "image_picker",
+          "id": "photo",
+          "label": "Photo"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Used instead of the photo when both are set."
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "Reviews",
-      "blocks": [
-        {
-          "type": "review",
-          "settings": {
-            "quote": "Turned up three days after I ordered and the quality is way past what I paid. Neighbours have asked where it came from twice.",
-            "name": "Danielle R.",
-            "place": "Philadelphia, PA"
-          }
-        },
-        {
-          "type": "review",
-          "settings": {
-            "quote": "I have bought Halloween stuff online for years and most of it is junk. This is the first time I would order again without thinking about it.",
-            "name": "Marcus T.",
-            "place": "Austin, TX"
-          }
-        },
-        {
-          "type": "review",
-          "settings": {
-            "quote": "Ordered late and still had it before the weekend. Kids lost their minds.",
-            "name": "Priya S.",
-            "place": "Chicago, IL"
-          }
-        }
-      ]
+      "name": "Reviews"
     }
   ]
 }

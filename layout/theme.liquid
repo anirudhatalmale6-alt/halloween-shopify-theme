@@ -75,7 +75,14 @@
         cart_add: '{{ routes.cart_add_url }}.js',
         cart_change: '{{ routes.cart_change_url }}.js',
         cart: '{{ routes.cart_url }}.js',
-        cart_page: '{{ routes.cart_url }}'
+        cart_page: '{{ routes.cart_url }}',
+        {%- comment -%}
+          Shopify publishes no routes.checkout_url, so it is built here rather
+          than hardcoded as '/checkout' - a store with a locale prefix serves
+          the root at /en and a bare /checkout drops the shopper's language.
+          The replace collapses the double slash when root_url is just '/'.
+        {%- endcomment -%}
+        checkout: '{{ routes.root_url | append: "/checkout" | replace: "//", "/" }}'
       },
       moneyFormat: {{ shop.money_format | json }},
       strings: {

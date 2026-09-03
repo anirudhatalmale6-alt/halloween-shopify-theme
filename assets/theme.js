@@ -255,7 +255,46 @@
 
   /* Delegated, because the drawer's contents are replaced wholesale on every
      change - handlers bound to the old rows would die with them. */
+  /* Buy It Now: add this one item, then go to checkout.
+
+     The variant id is read from the form's hidden #vid field at click time,
+     NOT from the button's own data-vid. The button is rendered once with the
+     first variant's id and the option pills rewrite #vid as the shopper
+     chooses - keying off the stale attribute would have sent every buyer to
+     checkout with the default size. */
+  function buyNow(btn) {
+    var vidEl = document.getElementById('vid');
+    var qtyEl = document.getElementById('qtyi');
+    var id = (vidEl && vidEl.value) || btn.getAttribute('data-vid');
+    var qty = parseInt((qtyEl && qtyEl.value) || '1', 10) || 1;
+    if (!id) { return; }
+    var original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'One moment...';
+
+    fetch(routes.cart_add, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ items: [{ id: id, quantity: qty }] })
+    })
+      .then(function (r) { return r.ok ? r.json() : cartError(r); })
+      .then(function () { window.location.href = routes.checkout; })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = original;
+        toast(err.message);
+      });
+  }
+
   on(document, 'click', function (e) {
+    var now = e.target.closest ? e.target.closest('.js-buynow') : null;
+    if (now) {
+      e.preventDefault();
+      buyNow(now);
+      return;
+    }
+
     var add = e.target.closest ? e.target.closest('.js-add') : null;
     if (add) {
       e.preventDefault();
@@ -454,4 +493,52 @@
     items.forEach(function (el) { io.observe(el); });
   }
   reveal();
+
+  /* ---------------------------------------------------------
+     Category jump bar: highlight whichever section you are in.
+
+     Driven by scroll position, not by which chip was clicked. Marking the
+     clicked one is easy and wrong - it goes stale the second you scroll away,
+     and it says nothing at all to someone who arrived by scrolling.
+     --------------------------------------------------------- */
+  /* An anchor link whose target is not on the page is worse than one fewer
+     link, and on Shopify the two ends are configured separately: the jump bar
+     is one section, each category row is another, and a row with no products
+     removes itself. So a chip can be left pointing at nothing without anyone
+     editing it - delete the last item in a category, or leave the fifteen
+     supplier-unavailable products as drafts, and the chip survives its target.
+
+     Checked here rather than in Liquid because a section cannot see whether a
+     different section decided to render. */
+  $$('a[href^="#"]').forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    if (!id || document.getElementById(id)) { return; }
+    if (a.classList.contains('chip') || a.classList.contains('cat')) {
+      a.hidden = true;
+    }
+  });
+
+  var chipBar = $('#chips');
+  if (chipBar) {
+    var chips = $$('.chip', chipBar).filter(function (ch) {
+      return (ch.getAttribute('href') || '').indexOf('#') === 0 && !ch.hidden;
+    });
+    var targets = chips.map(function (ch) {
+      return document.getElementById(ch.getAttribute('href').slice(1));
+    });
+    var spy = function () {
+      /* the first pixel of content visible under the header and the chip bar */
+      var line = chipBar.getBoundingClientRect().bottom + 8;
+      var best = -1;
+      targets.forEach(function (sec, i) {
+        if (!sec) { return; }
+        var r = sec.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) { best = i; }
+      });
+      chips.forEach(function (ch, i) { ch.classList.toggle('on', i === best); });
+    };
+    spy();
+    window.addEventListener('scroll', spy, { passive: true });
+    window.addEventListener('resize', spy);
+  }
 })();

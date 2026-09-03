@@ -1,36 +1,111 @@
+{%- comment -%}
+  Hero.
+
+  Two columns: the offer on the left, five real product photographs on the
+  right. The picture side answers "what does this shop sell" before a word is
+  read, which centred type on a gradient never did.
+
+  Where the five photos come from, in order of preference:
+    1. an image you picked in the theme editor (hero_img_1 ... hero_img_5)
+    2. the featured image of the first five products in the chosen collection
+    3. the first five products in the shop
+  So it is full of real products the moment the theme is installed, and every
+  tile is still individually replaceable without touching code.
+{%- endcomment -%}
+{%- liquid
+  assign pool = section.settings.collection.products
+  if pool == blank or pool.size == 0
+    assign pool = collections.all.products
+  endif
+-%}
 <section class="hero">
   <div class="hero__glow" aria-hidden="true"></div>
   <div class="wrap hero__in">
 
-    {%- if section.settings.kicker != blank -%}
-      <p class="hero__k">{{ section.settings.kicker | escape }}</p>
-    {%- endif -%}
-
-    <h1 class="hero__h">
-      {{ section.settings.heading | escape }}
-      {%- if section.settings.heading_accent != blank -%}
-        <span>{{ section.settings.heading_accent | escape }}</span>
+    <div class="hero__txt">
+      {%- if section.settings.kicker != blank -%}
+        <p class="hero__k">{{ section.settings.kicker | escape }}</p>
       {%- endif -%}
-    </h1>
 
-    {%- if section.settings.text != blank -%}
-      <p class="hero__p">{{ section.settings.text | escape }}</p>
-    {%- endif -%}
+      <h1 class="hero__h">
+        {{ section.settings.heading | escape }}
+        {%- if section.settings.heading_accent != blank -%}
+          {%- comment -%}
+            The <br> is load-bearing. The whitespace-stripping tags either side
+            eat the newline between the two halves, so without it the heading
+            rendered as "HAUNT YOUR HOUSE.SHIP IT FREE." with no break and no
+            space. Same trap as the announcement bar, one file over.
+          {%- endcomment -%}
+          <br>
+          <span>{{ section.settings.heading_accent | escape }}</span>
+        {%- endif -%}
+      </h1>
 
-    <div class="hero__cta">
-      {%- if section.settings.btn1_text != blank -%}
-        <a class="btn btn--gold" href="{{ section.settings.btn1_link | default: routes.all_products_collection_url }}">
-          {{ section.settings.btn1_text | escape }}
-        </a>
+      {%- if section.settings.text != blank -%}
+        <p class="hero__p">{{ section.settings.text | escape }}</p>
       {%- endif -%}
-      {%- if section.settings.btn2_text != blank -%}
-        <a class="btn btn--ghost" href="{{ section.settings.btn2_link | default: routes.root_url }}">
-          {{ section.settings.btn2_text | escape }}
-        </a>
+
+      {%- if section.settings.tick1 != blank or section.settings.tick2 != blank or section.settings.tick3 != blank -%}
+        <ul class="hero__ticks">
+          {%- if section.settings.tick1 != blank -%}<li>{{ section.settings.tick1 | escape }}</li>{%- endif -%}
+          {%- if section.settings.tick2 != blank -%}<li>{{ section.settings.tick2 | escape }}</li>{%- endif -%}
+          {%- if section.settings.tick3 != blank -%}<li>{{ section.settings.tick3 | escape }}</li>{%- endif -%}
+        </ul>
       {%- endif -%}
+
+      <div class="hero__cta">
+        {%- if section.settings.btn1_text != blank -%}
+          {%- comment -%} btn--xl is the "make it bigger and more noticeable"
+          request: a size up, heavier, and a slow pulse ring. {%- endcomment -%}
+          <a class="btn btn--gold btn--xl" href="{{ section.settings.btn1_link | default: routes.all_products_collection_url }}">
+            {{ section.settings.btn1_text | escape }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.btn2_text != blank -%}
+          <a class="btn btn--ghost" href="{{ section.settings.btn2_link | default: routes.root_url }}">
+            {{ section.settings.btn2_text | escape }}
+          </a>
+        {%- endif -%}
+      </div>
     </div>
 
-    {%- if section.settings.show_countdown -%}
+    {%- if section.settings.show_collage -%}
+      <div class="hcol">
+        {%- for i in (1..5) -%}
+          {%- liquid
+            assign key = 'hero_img_' | append: i
+            assign pic = section.settings[key]
+            assign prod = pool[forloop.index0]
+            if pic == blank and prod != blank
+              assign pic = prod.featured_image
+            endif
+            comment
+              The first two tiles are above the fold on every size measured,
+              so they load eagerly and the rest wait.
+            endcomment
+            assign how = 'lazy'
+            if i <= 2
+              assign how = 'eager'
+            endif
+          -%}
+          {%- if pic != blank -%}
+            <a class="hcol__t hcol__t--{{ i }}" href="{{ prod.url | default: routes.all_products_collection_url }}">
+              <img src="{{ pic | image_url: width: 600 }}"
+                   srcset="{{ pic | image_url: width: 300 }} 300w, {{ pic | image_url: width: 600 }} 600w"
+                   sizes="(max-width:900px) 40vw, 260px"
+                   alt="{{ pic.alt | default: prod.title | escape }}"
+                   width="600" height="600"
+                   loading="{{ how }}">
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  {%- if section.settings.show_countdown -%}
+    <div class="wrap">
       <div class="cdown" id="cdown" data-month="{{ section.settings.cd_month }}" data-day="{{ section.settings.cd_day }}">
         <div class="cdown__cell"><b id="cd-d">--</b><span>Days</span></div>
         <div class="cdown__cell"><b id="cd-h">--</b><span>Hours</span></div>
@@ -38,9 +113,8 @@
         <div class="cdown__cell"><b id="cd-s">--</b><span>Secs</span></div>
         <p class="cdown__lbl">{{ section.settings.cd_label | escape }}</p>
       </div>
-    {%- endif -%}
-
-  </div>
+    </div>
+  {%- endif -%}
 </section>
 
 {% schema %}
@@ -92,6 +166,66 @@
       "type": "url",
       "id": "btn2_link",
       "label": "Button 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tick1",
+      "label": "Tick 1",
+      "default": "Free US shipping, no minimum",
+      "info": "Three short promises under the paragraph. Leave blank to remove."
+    },
+    {
+      "type": "text",
+      "id": "tick2",
+      "label": "Tick 2",
+      "default": "Ships in 24 hours from a US warehouse"
+    },
+    {
+      "type": "text",
+      "id": "tick3",
+      "label": "Tick 3",
+      "default": "Before Oct 31 or it's free"
+    },
+    {
+      "type": "header",
+      "content": "Product photos"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collage",
+      "label": "Show product photos beside the text",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Take the photos from",
+      "info": "Leave empty to use the first products in the shop. Any of the five can be overridden below."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img_1",
+      "label": "Large photo (override)"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img_2",
+      "label": "Photo 2 (override)"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img_3",
+      "label": "Photo 3 (override)"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img_4",
+      "label": "Photo 4 (override)"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img_5",
+      "label": "Photo 5 (override)"
     },
     {
       "type": "header",

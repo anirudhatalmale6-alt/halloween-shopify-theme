@@ -13,8 +13,18 @@
     assign save_amt = v.compare_at_price | minus: v.price
   endif
 
-  assign rating = product.metafields.reviews.rating.value.rating | default: settings.card_fallback_rating
+  comment
+    No fallback rating here either - see the note in snippets/product-card.
+    The JSON-LD block at the bottom of this file only emits aggregateRating
+    when rating_count is real, and feeding Google a made-up 4.8 is how a
+    domain loses its rich results, so the two must not disagree.
+  endcomment
+  assign rating = product.metafields.reviews.rating.value.rating
+  if rating == blank and settings.card_use_fallback_rating
+    assign rating = settings.card_fallback_rating
+  endif
   assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  assign sold = product.metafields.custom.sold_count.value
 
   assign hook = product.metafields.custom.hook.value | default: product.metafields.custom.short_description.value
 
@@ -78,16 +88,24 @@
 
       <h1 class="pdp__h">{{ product.title }}</h1>
 
-      {%- if section.settings.show_rating -%}
+      {%- if section.settings.show_rating and rating != blank -%}
         <div class="pdp__rate">
           {%- if rating_count > 0 -%}
+            {%- comment -%}
+              The count is a LINK to the reviews further down the page. It is
+              the one piece of proof on this screen a sceptical shopper will
+              want to check, so checking it should be one tap.
+            {%- endcomment -%}
             {%- capture rc -%}
-              {{ rating }} &middot; {% render 'thousands', n: rating_count %} review{% unless rating_count == 1 %}s{% endunless %}
+              {{ rating | round: 1 }} &middot; <a href="#reviews">{% render 'thousands', n: rating_count %} review{% unless rating_count == 1 %}s{% endunless %}</a>
             {%- endcapture -%}
             {% render 'stars', rating: rating, count: rc, cls: 'pdp__rc' %}
           {%- else -%}
             {% render 'stars', rating: rating %}
-            <span class="pdp__rc">{{ rating }} out of 5</span>
+            <span class="pdp__rc">{{ rating | round: 1 }} out of 5</span>
+          {%- endif -%}
+          {%- if sold != blank and sold > 0 -%}
+            <span class="pdp__sold">{% render 'thousands', n: sold %}+ sold</span>
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -119,7 +137,17 @@
         {%- assign pct = v.inventory_quantity | times: 100 | divided_by: section.settings.low_stock -%}
         <div class="pdp__stock">
           <div class="pdp__bar"><i style="width:{{ pct }}%"></i></div>
+          {%- comment -%}
+            The real number when Shopify is tracking it, otherwise the wording
+            from Theme settings. Empty that setting and the line disappears
+            from all 52 pages at once.
+          {%- endcomment -%}
           <p>Only {{ v.inventory_quantity }} left in stock</p>
+        </div>
+      {%- elsif section.settings.show_stock and settings.urgency_text != blank -%}
+        <div class="pdp__stock">
+          <div class="pdp__bar"><i style="width:22%"></i></div>
+          <p>{{ settings.urgency_text | escape }}</p>
         </div>
       {%- endif -%}
 
@@ -155,24 +183,66 @@
           </div>
           <input type="hidden" name="quantity" id="qtyi" value="1">
 
-          <button class="btn btn--add" type="submit" id="buybtn" {% unless v.available %}disabled{% endunless %}>
-            {%- if v.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
+          {%- comment -%}
+            Add to cart is the OUTLINE button here and Buy It Now below is the
+            gold one - deliberately the reverse of the single-button layout
+            this replaced. A product page taking cold ad traffic is trying to
+            close one sale, not build a basket.
+          {%- endcomment -%}
+          <button class="btn btn--add btn--out" type="submit" id="buybtn" {% unless v.available %}disabled{% endunless %}>
+            {%- if v.available -%}{{ settings.add_to_cart_text | default: 'Add to Cart' }}{%- else -%}Sold out{%- endif -%}
           </button>
         </div>
+
+        {%- comment -%}
+          Buy It Now: adds this one item and goes straight to checkout, skipping
+          the cart. It is a plain button rather than Shopify's dynamic checkout
+          button on purpose - the dynamic one only renders when accelerated
+          checkout is switched on for the store AND the customer's browser
+          offers a wallet, so on a brand new store it is frequently just absent.
+          This one is always there. Turn on the dynamic buttons as well below if
+          you want Shop Pay and PayPal underneath it.
+        {%- endcomment -%}
+        {%- if section.settings.show_buy_now and v.available -%}
+          <button class="btn btn--gold btn--wide btn--buynow js-buynow" type="button"
+                  data-vid="{{ v.id }}">
+            {{ section.settings.buy_now_text | default: 'Buy It Now' }}
+          </button>
+          {%- if section.settings.buy_now_note != blank -%}
+            <p class="pdp__bnote">{{ section.settings.buy_now_note | escape }}</p>
+          {%- endif -%}
+        {%- endif -%}
 
         {%- if section.settings.show_dynamic_checkout -%}
           {{ form | payment_button }}
         {%- endif -%}
       {%- endform -%}
 
-      {%- if section.blocks.size > 0 -%}
-        <ul class="pdp__trust">
-          {%- for block in section.blocks -%}
-            {%- if block.type == 'assurance' -%}
-              <li {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</li>
-            {%- endif -%}
-          {%- endfor -%}
-        </ul>
+      {%- comment -%}
+        The four delivery promises come from Theme settings > Shipping &
+        guarantees, so they are written once and repeated on all 52 product
+        pages from there. Adding "Assurance" blocks to this section replaces
+        them, for the case where one product genuinely ships differently.
+      {%- endcomment -%}
+      {%- capture assurances -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'assurance' and block.settings.text != blank -%}
+            <li {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- if assurances contains '<li' -%}
+        <ul class="pdp__trust">{{ assurances }}</ul>
+      {%- else -%}
+        {%- capture globals -%}
+          {%- if settings.ship_free != blank -%}<li>{{ settings.ship_free | escape }}</li>{%- endif -%}
+          {%- if settings.ship_guarantee != blank -%}<li>{{ settings.ship_guarantee | escape }}</li>{%- endif -%}
+          {%- if settings.ship_dispatch != blank -%}<li>{{ settings.ship_dispatch | escape }}</li>{%- endif -%}
+          {%- if settings.ship_returns != blank -%}<li>{{ settings.ship_returns | escape }}</li>{%- endif -%}
+        {%- endcapture -%}
+        {%- if globals contains '<li' -%}
+          <ul class="pdp__trust">{{ globals }}</ul>
+        {%- endif -%}
       {%- endif -%}
     </div>
   </div>
@@ -350,10 +420,34 @@
       "default": true
     },
     {
+      "type": "header",
+      "content": "Buy buttons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Show a Buy It Now button",
+      "default": true,
+      "info": "Adds the item and goes straight to checkout, skipping the cart."
+    },
+    {
+      "type": "text",
+      "id": "buy_now_text",
+      "label": "Buy It Now text",
+      "default": "Buy It Now"
+    },
+    {
+      "type": "text",
+      "id": "buy_now_note",
+      "label": "Small line under it",
+      "default": "Straight to checkout - skips the cart"
+    },
+    {
       "type": "checkbox",
       "id": "show_dynamic_checkout",
-      "label": "Show the express checkout buttons",
-      "default": true
+      "label": "Also show Shop Pay / PayPal buttons",
+      "default": false,
+      "info": "Shopify's own express buttons. They only appear when accelerated checkout is switched on for your store and the shopper's browser offers a wallet, so they are off by default - Buy It Now above always works."
     },
     {
       "type": "header",
