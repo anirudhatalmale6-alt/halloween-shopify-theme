@@ -46,9 +46,22 @@ descriptions, benefit bullets, categories and photos.
 
 ### Before you import: set your prices
 
-The price column is blank on 51 of the 52. TikTok Shop puts the price behind a
-captcha so I could not read it, and your selling price is your margin decision
-anyway. Only the SplatMat has a price, because its own store publishes one.
+**22 of the 52 already have a verified price.** Each one was read off the
+supplier's own pages and then checked against a second source before it went
+in — see section 3 of the demo site's README for how, and why fifteen other
+figures were thrown out.
+
+**30 are still blank**, for two different reasons:
+
+- **15 products the supplier no longer lists.** They import as **drafts**,
+  tagged `unavailable-at-supplier`, so they cannot go on sale by accident.
+  Leave them as drafts until you have confirmed they are really gone.
+- **15 products that need a price from you.** Six had two candidate prices
+  that I could not choose between, and nine appear on no page I could reach.
+  You can read these off your phone in about two minutes.
+
+One price needs your judgement rather than a copy: Walmart sells the scary
+face headrest covers for **$1.99**. Free US shipping cannot come out of $1.99.
 
 Open `products-import.csv` and fill in two columns:
 
@@ -71,11 +84,12 @@ so the images become yours - they do not stay linked to anywhere else.
 You can split the file and import in batches. Do ten, look at the store, then
 do the rest.
 
-### One product has no photo
+### Every product has photos
 
-`scary-face-headrest-covers` - the Walmart headrest covers. Walmart blocks
-automated requests to that page, so I have the name from the link and nothing
-else. Add a photo and a price by hand after the import.
+All 52 arrive with the supplier's own photographs — 58 images in total. The
+Walmart headrest covers were the last gap and now have four: fitted in a dark
+car, the gag shot with the driver, a plain white-background shot, and the
+dimension diagram.
 
 ### Two possible duplicates
 

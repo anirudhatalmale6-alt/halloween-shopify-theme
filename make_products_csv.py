@@ -14,6 +14,13 @@ import sys
 DEMO = "/var/lib/freelancer/projects/40609577/halloween-demo"
 sys.path.insert(0, DEMO)
 import catalog  # noqa: E402
+import build  # noqa: E402
+
+# catalog.py carries price=None for every product; the prices live in
+# prices.csv and are overlaid at build time. Without this the export writes a
+# spreadsheet with every price blank while reporting itself as fine - the same
+# trap the page audit fell into, from the same cause.
+build.load_prices()
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -66,15 +73,23 @@ def image_url(p, i):
 
 
 def product_rows(p):
-    """A product is one row, plus one extra row per additional photo."""
+    """A product is one row, plus one extra row per additional photo.
+
+    Products the supplier has stopped listing import as DRAFTS. They still
+    arrive - photos, copy, the lot - so nothing has to be rebuilt if they come
+    back, but they cannot be bought until the client publishes them himself.
+    Importing them as active would put fifteen unfulfillable products on a live
+    storefront the moment the file is uploaded.
+    """
+    gone = p["slug"] in catalog.UNAVAILABLE
     rows = [row(
         Handle=p["slug"],
         Title=p["name"],
         Vendor="",
         Type=p["cat"],
-        Tags=p["cat"],
-        Published="TRUE",
-        Status="active",
+        Tags=p["cat"] + (", unavailable-at-supplier" if gone else ""),
+        Published="FALSE" if gone else "TRUE",
+        Status="draft" if gone else "active",
         **{
             "Body (HTML)": body_html(p),
             "Option1 Name": "Title",
