@@ -62,6 +62,25 @@
                  sizes="(max-width:860px) 90vw, 360px"
                  alt="{{ block.settings.photo.alt | default: 'Customer photo' | escape }}"
                  loading="lazy" width="600" height="450">
+          {%- elsif block.settings.photo_asset != blank -%}
+            {%- comment -%}
+              Third fallback: a photo that SHIPS WITH THE THEME, in assets/.
+
+              The picker above needs a file uploaded to Content > Files, which
+              cannot be done from inside a theme zip - so without this the
+              theme would install with the customer photos it actually has
+              sitting in the folder, unreferenced, and the section would look
+              empty until somebody uploaded them by hand.
+
+              The picker still wins. Choose an image there and this is ignored,
+              so replacing a supplier photo with a real customer's photo later
+              is one click and no editing.
+            {%- endcomment -%}
+            <img class="rev__img"
+                 src="{{ block.settings.photo_asset | asset_url }}"
+                 sizes="(max-width:860px) 90vw, 360px"
+                 alt="Customer photo"
+                 loading="lazy" width="600" height="450">
           {%- endif -%}
 
           <figcaption>
@@ -213,6 +232,12 @@
           "id": "video",
           "label": "Video",
           "info": "Used instead of the photo when both are set."
+        },
+        {
+          "type": "text",
+          "id": "photo_asset",
+          "label": "Photo shipped with the theme",
+          "info": "A filename in the theme's assets folder. Already filled in with the buyer photo from the supplier's listing. Pick a Photo above to replace it, or clear this box to show no photo."
         }
       ]
     }

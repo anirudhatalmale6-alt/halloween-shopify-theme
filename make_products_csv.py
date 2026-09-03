@@ -82,8 +82,18 @@ def body_html(p):
 
 
 def image_url(p, i):
-    suffix = "" if i == 0 else f"-{i + 1}"
-    return f"{IMG_BASE}/{p['slug']}{suffix}.jpg"
+    """The filename is read out of the list, never computed from the index.
+
+    Deriving `slug-3.jpg` from position 3 holds only while the positions run
+    1..n with no holes. Delete one row from the middle of photos.csv and every
+    name after the hole points at a file that is not there - which on a Shopify
+    import is worse than on the site, because the importer just skips the image
+    and the product lands with a gap nobody is told about.
+    """
+    name = str(p["images"][i])
+    if not name.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+        name = f"{p['slug']}.jpg" if i == 0 else f"{p['slug']}-{i + 1}.jpg"
+    return f"{IMG_BASE}/{name}"
 
 
 def product_rows(p):

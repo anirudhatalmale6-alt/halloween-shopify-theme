@@ -110,12 +110,34 @@ the homepage says so in a line underneath, and you should leave that line there
 until your own orders start producing reviews. Quoting a product review is
 normal; presenting it as your own customer is not.
 
-### Every product has photos
+### Every product arrives with its whole photo gallery
 
-All 52 arrive with the supplier's own photographs — 58 images in total. The
-Walmart headrest covers were the last gap and now have four: fitted in a dark
-car, the gag shot with the driver, a plain white-background shot, and the
-dimension diagram.
+All 52 arrive with the supplier's own photographs — **287 images in total**,
+five to eight on nearly every product. Each becomes a thumbnail under the main
+image on the product page, and clicking one enlarges it.
+
+It used to be one photo each. That single image was the catalogue shot carried
+in the link you sent me; the rest of each gallery lives inside the product page
+itself and had to be pulled out of it separately.
+
+Three things worth knowing:
+
+- **Two products still have one photo** (the Walmart splat mat and the headrest
+  covers have four each, from Walmart). One TikTok product — the white hero
+  mask with the remote — has one, because the supplier's page will not load
+  from outside the US no matter how I ask. If you open that product on your
+  phone you can save the extra photos and drag them into Shopify.
+- **Some gallery frames are the supplier's marketing graphics**, not
+  photographs: "ours vs theirs" comparison charts, "kit includes" diagrams,
+  installation steps. A comparison chart is a claim your shop is making, so
+  look at those before you go live. Deleting one is deleting its row from the
+  CSV before you import, or deleting the image in Shopify afterwards.
+- **A few carry the supplier's own brand text** printed into the picture. Same
+  fix — delete the ones you do not want.
+
+Duplicates were removed automatically: the supplier serves the same photograph
+under several URLs and at several crops, and 38 frames were dropped because
+they were a picture the product already had.
 
 ### Two possible duplicates
 
@@ -129,8 +151,12 @@ twice. Both are in the file; delete a row if you agree they are duplicates.
 
 One row per extra photo: repeat the `Handle`, leave everything else blank, and
 put the next photo in `Image Src` with `Image Position` 2, 3, 4 and so on.
-Three photos per product is where the gallery looks best - most of yours
-currently have one, because that is all the supplier listing carried.
+That is exactly how the 287 photos already in the file are laid out, so copy
+the pattern from any product in it.
+
+The product page shows up to **eight** thumbnails. Anything past the eighth is
+still imported and still in Shopify's media library — it just does not appear
+in the strip, so put the best shot first.
 
 ### Products with sizes or colours
 

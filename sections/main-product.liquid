@@ -369,8 +369,19 @@
   "@type": "Product",
   "name": {{ product.title | json }},
   "url": {{ request.origin | append: product.url | json }},
-  {%- if product.featured_media -%}
-  "image": [{{ product.featured_media | image_url: width: 1200 | prepend: "https:" | json }}],
+  {%- comment -%}
+    Every photo, not just the featured one. Google's product rich result takes
+    an array and shows more of it than one image; the products now arrive with
+    five to eight photos each from the supplier gallery, so listing one was
+    throwing away the other seven for free.
+  {%- endcomment -%}
+  {%- if product.images.size > 0 -%}
+  "image": [
+    {%- for img in product.images limit: 8 -%}
+      {{ img | image_url: width: 1200 | prepend: "https:" | json }}
+      {%- unless forloop.last %},{% endunless -%}
+    {%- endfor -%}
+  ],
   {%- endif -%}
   "description": {{ product.description | strip_html | truncate: 500 | json }},
   {%- if product.vendor != blank -%}

@@ -266,7 +266,11 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   background:rgba(123,255,106,.14);border:1px solid rgba(123,255,106,.5);color:var(--green);
   font-size:.8rem;font-weight:700;letter-spacing:.6px;padding:.35rem .65rem;border-radius:8px;
 }
-.pdp__thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+/* Four across, not three. Products import with five to eight supplier photos
+   each, and eight over three columns is two full rows plus an orphan sitting
+   alone underneath. Four gives 8 a clean 4+4 and 7 a 4+3, and the thumbs stay
+   above 70px wide even on a 360px phone. */
+.pdp__thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
 .pdp__thumb{
   background:radial-gradient(circle at 50% 45%,#241a33,#120d1b);
   border:1px solid var(--line2);border-radius:12px;padding:8px;cursor:pointer;
