@@ -104,8 +104,21 @@ def product_rows(p):
     back, but they cannot be bought until the client publishes them himself.
     Importing them as active would put fifteen unfulfillable products on a live
     storefront the moment the file is uploaded.
+
+    So does a product with NO PRICE, and that one I got wrong first time. The
+    comment further down says a blank price cell is "visibly unfinished" - and
+    it is, in the spreadsheet. But Shopify's importer does not keep it blank:
+    it stores 0.00, and 0.00 is a working price on a buyable product. Fifteen
+    items he has not priced yet were therefore heading for his storefront at
+    free, with an Add to Cart button that works.
+
+    A product nobody has priced cannot be for sale. It imports as a draft
+    carrying the `needs-price` tag, so filtering the admin by that tag lists
+    exactly what is waiting on him, and publishing is a bulk action once the
+    numbers arrive.
     """
     gone = p["slug"] in catalog.UNAVAILABLE
+    unpriced = not p["price"]
     # A rating is only written when the supplier published one. No fallback,
     # no default - a product with no reviews imports with an empty metafield
     # and the theme then renders no stars at all for it.
@@ -118,9 +131,10 @@ def product_rows(p):
         Title=p["name"],
         Vendor="",
         Type=p["cat"],
-        Tags=p["cat"] + (", unavailable-at-supplier" if gone else ""),
-        Published="FALSE" if gone else "TRUE",
-        Status="draft" if gone else "active",
+        Tags=p["cat"] + (", unavailable-at-supplier" if gone else "")
+                      + (", needs-price" if unpriced and not gone else ""),
+        Published="FALSE" if gone or unpriced else "TRUE",
+        Status="draft" if gone or unpriced else "active",
         **{
             "Body (HTML)": body_html(p),
             "Option1 Name": "Title",
@@ -157,6 +171,10 @@ def product_rows(p):
     return rows
 
 
+def rows_drafted(rows, tag):
+    return [r for r in rows if r["Title"] and tag in (r["Tags"] or "")]
+
+
 def main():
     catalog.check()
     rows = []
@@ -171,8 +189,18 @@ def main():
 
     unpriced = [p["slug"] for p in catalog.PRODUCTS if not p["price"]]
     nophoto = [p["slug"] for p in catalog.PRODUCTS if not p["images"]]
+    live = [r for r in rows if r["Title"] and r["Published"] == "TRUE"]
     print(f"products-import.csv: {len(catalog.PRODUCTS)} products, {len(rows)} rows")
-    print(f"  {len(unpriced)} with no price yet")
+
+    # The number that actually matters to him is how many appear on the
+    # storefront, and the ONLY way a $0.00 product reaches it is a bug here.
+    # Assert it rather than print it.
+    free = [r for r in live if not r["Variant Price"]]
+    assert not free, f"{len(free)} published products have no price: {free}"
+    print(f"  {len(live)} go live and can be bought")
+    print(f"  {len(rows_drafted(rows, 'unavailable-at-supplier'))} draft - delisted at the supplier")
+    print(f"  {len(rows_drafted(rows, 'needs-price'))} draft - waiting on a price from the client")
+    print(f"  ({len(unpriced)} unpriced in total)")
     rated = [p for p in catalog.PRODUCTS if p.get("rating")]
     print(f"  {len(nophoto)} with no photo: {nophoto}")
     print(f"  {len(rated)} carrying a real supplier rating "

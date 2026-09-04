@@ -26,13 +26,13 @@
     assign heading = col.title
   endif
 
-  assign limit = section.settings.count | default: 8
+  assign max_items = section.settings.count | default: 8
   assign total = col.products_count | default: 0
 -%}
 
 {%- capture rows -%}
   {%- if col != blank -%}
-    {%- for product in col.products limit: limit -%}
+    {%- for product in col.products limit: max_items -%}
       {% render 'product-card', product: product %}
     {%- endfor -%}
   {%- elsif section.settings.tag != blank -%}
@@ -52,7 +52,7 @@
       {%- endfor -%}
       {%- if hit -%}
         {%- assign found = found | plus: 1 -%}
-        {%- if shown < limit -%}
+        {%- if shown < max_items -%}
           {%- assign shown = shown | plus: 1 -%}
           {% render 'product-card', product: product %}
         {%- endif -%}
@@ -82,7 +82,7 @@
 
       <div class="grid">{{ rows }}</div>
 
-      {%- if section.settings.show_view_all and col != blank and total > limit -%}
+      {%- if section.settings.show_view_all and col != blank and total > max_items -%}
         <p class="cat__more">
           <a class="btn btn--ghost" href="{{ col.url }}">
             {{ section.settings.view_all_text | default: 'See all' | escape }} {{ heading | escape }}

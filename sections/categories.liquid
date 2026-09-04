@@ -31,7 +31,68 @@
           else
             assign href = routes.all_products_collection_url
           endif
-          assign count = c.products_count
+          comment
+            `| default: 0`, because with no collection picked this is nil, and
+            the `count > 0` test below then compares nil against a number.
+            Shopify's Liquid swallows that and renders nothing; a stricter
+            engine raises. Same visible result, but only one of them is a
+            statement about the template rather than about the engine.
+          endcomment
+          assign count = c.products_count | default: 0
+        -%}
+
+        {%- comment -%}
+          Tag fallback, same idea as the Collection row section: with no
+          collection picked and no image uploaded, find the products carrying
+          this tag and borrow the first one's photo.
+
+          Without this a store that has just imported the products CSV shows six
+          identical grey Shopify placeholder squares, because a tile's image
+          comes from a collection and a CSV import cannot create collections.
+          The shop is full and the tiles say it is empty - which is exactly what
+          the client photographed and sent me.
+
+          The tag defaults to the tile's own title, so the six tiles fill
+          themselves in with no settings to change: "LED Masks" the tile finds
+          "LED Masks" the tag. It also supplies the "6 products" count, which is
+          why the scan runs whenever there is no collection rather than only
+          when the picture is missing - uploading your own tile image should not
+          silently delete the count underneath it.
+
+          A collection, once made, wins over all of this. The tag route is what
+          makes a fresh CSV import look like a shop on its own.
+        {%- endcomment -%}
+        {%- liquid
+          assign cat_img = ''
+          assign want = ''
+          if c == blank
+            assign want = block.settings.tag | default: block.settings.title | downcase | strip
+          endif
+
+          if want != blank
+            assign need_img = false
+            if block.settings.image == blank
+              assign need_img = true
+            endif
+            assign tagged = 0
+            for product in collections.all.products
+              assign hit = false
+              for t in product.tags
+                assign tt = t | downcase | strip
+                if tt == want
+                  assign hit = true
+                  break
+                endif
+              endfor
+              if hit
+                assign tagged = tagged | plus: 1
+                if need_img and cat_img == blank and product.featured_image != blank
+                  assign cat_img = product.featured_image
+                endif
+              endif
+            endfor
+            assign count = tagged
+          endif
         -%}
         <a class="cat rv" href="{{ href }}" {{ block.shopify_attributes }}>
           {%- if block.settings.image != blank -%}
@@ -40,6 +101,9 @@
           {%- elsif c != blank and c.featured_image != blank -%}
             <img src="{{ c.featured_image | image_url: width: 240 }}"
                  alt="{{ c.title | escape }}" width="240" height="240" loading="lazy">
+          {%- elsif cat_img != blank -%}
+            <img src="{{ cat_img | image_url: width: 240 }}"
+                 alt="{{ block.settings.title | escape }}" width="240" height="240" loading="lazy">
           {%- else -%}
             {{ 'collection-1' | placeholder_svg_tag: 'cat__ph' }}
           {%- endif -%}
@@ -108,7 +172,13 @@
           "type": "image_picker",
           "id": "image",
           "label": "Image",
-          "info": "Falls back to the collection image."
+          "info": "Falls back to the collection image, then to the first product carrying the tag below."
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "...or a product tag",
+          "info": "Used for the picture and the product count when no collection is picked. Leave blank to use the title above as the tag - which is what the six default tiles do."
         },
         {
           "type": "text",
