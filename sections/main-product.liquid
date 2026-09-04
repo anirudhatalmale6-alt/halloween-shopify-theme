@@ -35,11 +35,47 @@
     upgrade, never a prerequisite for shipping.
   endcomment
   assign bullets = product.metafields.custom.bullets.value
+  assign li_source = ''
   if bullets == blank and product.description != blank
-    assign plain = product.description | strip_html | strip
-    assign bullets = plain | split: '. '
+    if product.description contains '<li>'
+      assign li_source = product.description
+    else
+      assign plain = product.description | strip_html | strip
+      assign bullets = plain | split: '. '
+    endif
   endif
 -%}
+
+{%- comment -%}
+  If the description already HAS a list, use its items. Sentence-splitting a
+  description that ends in a <ul> does not work: strip_html joins the list
+  items with nothing at all between them, and list items do not end in a full
+  stop, so `split: '. '` cannot see the joins. Every product page on the store
+  was rendering its last bullet as all three run together -
+
+    "Long line, drop shoulder, worn open. The same ribcage knit in green,
+     pink, cream and black Long line, drop shoulder, made to be worn open
+     Unisex sizing"
+
+  - which looked like bad copy rather than a template bug, so it survived a
+  whole round of review on a live storefront.
+{%- endcomment -%}
+{%- if li_source != '' -%}
+  {%- capture bullet_list -%}
+    {%- assign chunks = li_source | split: '<li>' -%}
+    {%- for chunk in chunks offset: 1 -%}
+      {%- assign one = chunk | split: '</li>' | first | strip_html | strip -%}
+      {%- if one != blank -%}{{ one }}~|~{%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+  {%- comment -%}
+    remove_last first. Every item is written with a trailing separator, so the
+    captured string ends in one, and `split` keeps the empty piece after it -
+    which renders as a blank bullet with a tick beside it at the bottom of
+    every product page.
+  {%- endcomment -%}
+  {%- assign bullets = bullet_list | strip | remove_last: '~|~' | split: '~|~' -%}
+{%- endif -%}
 
 <section class="pdp">
   <div class="wrap pdp__in">
@@ -222,6 +258,18 @@
           {%- endif -%}
         {%- endif -%}
 
+        {%- comment -%}
+          The express wallet button. This renders ONE wallet, and the theme
+          does not get to say which: Shopify sends the choice down in the
+          <shopify-accelerated-checkout> element as `recommended`, picked from
+          Settings > Payments > Shopify Payments > Manage > Wallets and then
+          filtered by what the shopper's own device supports.
+
+          So "replace Shop Pay with Apple Pay and Google Pay" is a Settings
+          change, not a code change. Hiding <shop-pay-wallet-button> with CSS
+          from here does NOT promote the next wallet - Shopify has already
+          decided, and the slot would simply render empty.
+        {%- endcomment -%}
         {%- if section.settings.show_dynamic_checkout -%}
           {{ form | payment_button }}
         {%- endif -%}
@@ -466,9 +514,9 @@
     {
       "type": "checkbox",
       "id": "show_dynamic_checkout",
-      "label": "Also show Shop Pay / PayPal buttons",
+      "label": "Also show the express wallet button",
       "default": false,
-      "info": "Shopify's own express buttons. They only appear when accelerated checkout is switched on for your store and the shopper's browser offers a wallet, so they are off by default - Buy It Now above always works."
+      "info": "Shopify's own express button - Shop Pay, Apple Pay or Google Pay. WHICH one appears is not a theme setting: Shopify picks it in Settings > Payments > Shopify Payments > Manage > Wallets, and then only shows the one the shopper's device supports. Apple Pay renders in Safari on Apple hardware only, so it will never appear on a Windows PC no matter what is ticked here. Untick this to hide the row entirely; Buy It Now above always works."
     },
     {
       "type": "header",

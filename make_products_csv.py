@@ -57,7 +57,7 @@ def load_variants():
         handle = (r.get("handle") or "").strip()
         if not handle:
             continue
-        opts, imgs = [], {}
+        opts, imgs, prices = [], {}, {}
         for n in ("1", "2", "3"):
             name = (r.get(f"option{n}_name") or "").strip()
             vals = [v.strip() for v in (r.get(f"option{n}_values") or "").split("|") if v.strip()]
@@ -70,8 +70,34 @@ def load_variants():
             for i, v in enumerate(vals):
                 if i < len(files) and files[i]:
                     imgs[(name, v)] = files[i]
+
+            # Per-value prices, for the options where the price MOVES with the
+            # choice: a set of three ornaments, a 24-pack of candles. Size and
+            # colour do not need this and leave the column empty.
+            #
+            # A blank slot means "same as the product price". A slot that is
+            # filled in but not a number is refused rather than coerced - a
+            # typo silently becoming 0.00 is exactly the bug that nearly put
+            # fifteen free products on this store.
+            raw = [v.strip().lstrip("$").replace(",", "")
+                   for v in (r.get(f"option{n}_prices") or "").split("|")]
+            for i, v in enumerate(vals):
+                if i >= len(raw) or not raw[i]:
+                    continue
+                try:
+                    prices[(name, v)] = float(raw[i])
+                except ValueError:
+                    sys.exit(f"variants.csv: {handle} option{n}_prices slot "
+                             f"{i + 1} ({v}) is {raw[i]!r}, which is not a price")
         if opts:
-            out[handle] = {"options": opts, "images": imgs,
+            # More than one priced option would mean two axes both moving the
+            # price, and nothing here decides whether they add or multiply.
+            # Refuse rather than pick one silently.
+            axes = {name for name, _v in prices}
+            if len(axes) > 1:
+                sys.exit(f"variants.csv: {handle} sets prices on {sorted(axes)}. "
+                         f"Only one option may carry prices.")
+            out[handle] = {"options": opts, "images": imgs, "prices": prices,
                            "evidence": (r.get("evidence") or "").strip()}
     return out
 
@@ -191,6 +217,7 @@ def product_rows(p):
     spec = VARIANTS.get(p["slug"])
     opts = spec["options"] if spec else [("Title", ["Default Title"])]
     vimgs = spec["images"] if spec else {}
+    vprices = spec.get("prices", {}) if spec else {}
     # A rating is only written when the supplier published one. No fallback,
     # no default - a product with no reviews imports with an empty metafield
     # and the theme then renders no stars at all for it.
@@ -217,6 +244,19 @@ def product_rows(p):
             if f:
                 vimg = f"{IMG_BASE}/{f}"
                 break
+
+        # A pack size charges its own price; a size or a colour does not and
+        # falls through to the product price. The discount is scaled with it,
+        # because carrying the single item's "was" price onto a set of three
+        # would print a 71% saving that was never offered.
+        vprice, vwas = p["price"], p["was"]
+        for (oname, _vals), v in zip(opts, chosen):
+            if (oname, v) in vprices:
+                over = vprices[(oname, v)]
+                if vprice and vwas:
+                    vwas = round(vwas * over / vprice, 2)
+                vprice = over
+                break
         r = row(
             Handle=p["slug"],
             Title=p["name"] if first else "",
@@ -237,8 +277,8 @@ def product_rows(p):
                 # unfinished. See the note in the docstring - the spreadsheet
                 # is not where that protection belongs, which is why the
                 # unpriced products are drafted above as well.
-                "Variant Price": f"{p['price']:.2f}" if p["price"] else "",
-                "Variant Compare At Price": f"{p['was']:.2f}" if p["was"] else "",
+                "Variant Price": f"{vprice:.2f}" if vprice else "",
+                "Variant Compare At Price": f"{vwas:.2f}" if vwas else "",
                 "Variant Requires Shipping": "TRUE",
                 "Variant Taxable": "TRUE",
                 "Image Src": (image_url(p, 0) if p["images"] else "") if first else "",
