@@ -386,6 +386,25 @@
     if (priceEl) { priceEl.textContent = money(v.price); }
     if (stickPrice) { stickPrice.textContent = money(v.price); }
 
+    /* Show the photo of the thing they just picked. Only some variants carry
+       one - a size has no photo of its own, a colour usually does - so a
+       variant with no image leaves the gallery exactly where it was rather
+       than resetting it to the first frame. The matching thumbnail is
+       highlighted too, otherwise the strip claims a different photo is showing
+       than the one on screen. */
+    var vsrc = v.featured_image && v.featured_image.src;
+    if (vsrc && stageImg) {
+      stageImg.src = vsrc;
+      /* The thumb's data-full comes from image_url and carries a &width=900;
+         the variant's src does not. Compare the file path only - matching the
+         whole string finds nothing and quietly leaves the strip highlighting
+         the wrong frame. */
+      var key = function (u) { return String(u).split('?')[0].replace(/^https?:/, ''); };
+      $$('.pdp__thumb').forEach(function (t) {
+        t.classList.toggle('on', key(t.getAttribute('data-full')) === key(vsrc));
+      });
+    }
+
     if (wasEl) {
       if (v.compare_at_price && v.compare_at_price > v.price) {
         wasEl.textContent = money(v.compare_at_price);
@@ -395,13 +414,18 @@
       }
     }
 
+    /* The wording is read from data-add, not hardcoded. "Add to Cart" is a
+       theme setting he can change to anything, and this line used to throw it
+       away the moment a shopper touched a variant pill. */
     if (buyBtn) {
       buyBtn.disabled = !v.available;
-      buyBtn.textContent = v.available ? 'Add to cart' : 'Sold out';
+      buyBtn.textContent = v.available
+        ? (buyBtn.getAttribute('data-add') || 'Add to Cart') : 'Sold out';
     }
     if (stickAdd) {
       stickAdd.disabled = !v.available;
-      stickAdd.textContent = v.available ? 'Add' : 'Sold out';
+      stickAdd.textContent = v.available
+        ? (stickAdd.getAttribute('data-add') || 'Add') : 'Sold out';
     }
 
     /* keep the URL honest so a copied link opens on the same variant */

@@ -189,7 +189,16 @@
             this replaced. A product page taking cold ad traffic is trying to
             close one sale, not build a basket.
           {%- endcomment -%}
-          <button class="btn btn--add btn--out" type="submit" id="buybtn" {% unless v.available %}disabled{% endunless %}>
+          {%- comment -%}
+            data-add carries the wording, because the button's own text is not
+            a safe place to read it back from: on a variant that is sold out
+            the button starts life saying "Sold out". Without this the first
+            time a shopper switched variant the label reverted to a hardcoded
+            "Add to cart" and the setting above was silently discarded.
+          {%- endcomment -%}
+          <button class="btn btn--add btn--out" type="submit" id="buybtn"
+                  data-add="{{ settings.add_to_cart_text | default: 'Add to Cart' | escape }}"
+                  {% unless v.available %}disabled{% endunless %}>
             {%- if v.available -%}{{ settings.add_to_cart_text | default: 'Add to Cart' }}{%- else -%}Sold out{%- endif -%}
           </button>
         </div>
@@ -348,7 +357,8 @@
       {%- if on_sale -%}<s>{{ v.compare_at_price | money }}</s>{%- endif -%}
     </span>
   </div>
-  <button class="btn btn--add" type="button" id="stickadd" {% unless v.available %}disabled{% endunless %}>
+  <button class="btn btn--add" type="button" id="stickadd" data-add="Add"
+          {% unless v.available %}disabled{% endunless %}>
     {%- if v.available -%}Add{%- else -%}Sold out{%- endif -%}
   </button>
 </div>

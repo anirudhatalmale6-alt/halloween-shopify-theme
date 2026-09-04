@@ -36,14 +36,76 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 # GitHub Pages site instead, which is stable.
 IMG_BASE = "https://anirudhatalmale6-alt.github.io/halloween-store-demo/assets/products"
 
+def load_variants():
+    """Read variants.csv into {handle: [(option_name, [values]), ...]}.
+
+    The variant lists live in a spreadsheet next to prices.csv for the same
+    reason the prices do: the client changes what he sells by editing a cell,
+    not by editing Python. Each row also carries the evidence that proved that
+    list, which is the column I care about most - see the file itself.
+    """
+    path = os.path.join(DEMO, "variants.csv")
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, newline="", encoding="utf-8") as f:
+        # The file is commented, and csv.DictReader has no notion of a comment;
+        # it would hand back a row whose Handle is "# Every row here is..." and
+        # that row would then quietly become a product.
+        lines = [ln for ln in f if not ln.lstrip().startswith("#")]
+    for r in csv.DictReader(lines):
+        handle = (r.get("handle") or "").strip()
+        if not handle:
+            continue
+        opts, imgs = [], {}
+        for n in ("1", "2", "3"):
+            name = (r.get(f"option{n}_name") or "").strip()
+            vals = [v.strip() for v in (r.get(f"option{n}_values") or "").split("|") if v.strip()]
+            if not name or not vals:
+                continue
+            opts.append((name, vals))
+            # Position-aligned with the values, and short lists are allowed, so
+            # zip() would silently drop the tail rather than complain.
+            files = [v.strip() for v in (r.get(f"option{n}_images") or "").split("|")]
+            for i, v in enumerate(vals):
+                if i < len(files) and files[i]:
+                    imgs[(name, v)] = files[i]
+        if opts:
+            out[handle] = {"options": opts, "images": imgs,
+                           "evidence": (r.get("evidence") or "").strip()}
+    return out
+
+
+VARIANTS = load_variants()
+
+# A garment sold in several colours but with no size list anywhere in the
+# supplier's photos. The colours are real and the product can go live, but
+# whoever packs it still has to be told a size, so it is tagged and reported
+# rather than left to be discovered by the first customer.
+NEEDS_SIZE = {"skull-drop-shoulder-sweater", "toddler-ghost-overalls"}
+
+
+def combos(opts):
+    """Every combination of the option values, first option varying slowest.
+
+    Shopify reads the order literally: this is the order the pills appear in on
+    the product page, so Size before Color means the size row is drawn first.
+    """
+    out = [[]]
+    for _name, vals in opts:
+        out = [c + [v] for c in out for v in vals]
+    return out
+
+
 HEADERS = [
     "Handle", "Title", "Body (HTML)", "Vendor", "Type", "Tags", "Published",
-    "Option1 Name", "Option1 Value",
+    "Option1 Name", "Option1 Value", "Option2 Name", "Option2 Value",
+    "Option3 Name", "Option3 Value",
     "Variant SKU", "Variant Inventory Tracker", "Variant Inventory Qty",
     "Variant Inventory Policy", "Variant Fulfillment Service",
     "Variant Price", "Variant Compare At Price",
     "Variant Requires Shipping", "Variant Taxable",
-    "Image Src", "Image Position", "Image Alt Text",
+    "Image Src", "Image Position", "Image Alt Text", "Variant Image",
     "SEO Title", "SEO Description", "Status",
     # Shopify's product importer writes metafields when the column is named
     # exactly like this. `reviews.rating` / `reviews.rating_count` is the
@@ -116,9 +178,19 @@ def product_rows(p):
     carrying the `needs-price` tag, so filtering the admin by that tag lists
     exactly what is waiting on him, and publishing is a bulk action once the
     numbers arrive.
+
+    Variants come from variants.csv and every one of them is charged the same
+    price as the product. That is true of a size, a colour and a style, and it
+    is NOT true of a pack size - so the Sitting Skeleton Ornament, whose photo
+    offers "1PC OR 1SET", is deliberately not in that file. Selling a set of
+    three at the price of one is the same class of mistake as the $0.00
+    products, and it needs a second number from the client, not a guess.
     """
     gone = p["slug"] in catalog.UNAVAILABLE
     unpriced = not p["price"]
+    spec = VARIANTS.get(p["slug"])
+    opts = spec["options"] if spec else [("Title", ["Default Title"])]
+    vimgs = spec["images"] if spec else {}
     # A rating is only written when the supplier published one. No fallback,
     # no default - a product with no reviews imports with an empty metafield
     # and the theme then renders no stars at all for it.
@@ -126,42 +198,70 @@ def product_rows(p):
     if p.get("rating"):
         rating = ('{"scale_min":"1.0","scale_max":"5.0","value":"'
                   + f'{p["rating"]:.1f}' + '"}')
-    rows = [row(
-        Handle=p["slug"],
-        Title=p["name"],
-        Vendor="",
-        Type=p["cat"],
-        Tags=p["cat"] + (", unavailable-at-supplier" if gone else "")
-                      + (", needs-price" if unpriced and not gone else ""),
-        Published="FALSE" if gone or unpriced else "TRUE",
-        Status="draft" if gone or unpriced else "active",
-        **{
-            "Body (HTML)": body_html(p),
-            "Option1 Name": "Title",
-            "Option1 Value": "Default Title",
-            "Variant SKU": p["slug"].upper()[:32],
-            "Variant Inventory Tracker": "shopify",
-            "Variant Inventory Qty": 25,
-            "Variant Inventory Policy": "deny",
-            "Variant Fulfillment Service": "manual",
-            # Blank, not 0.00. A zero here imports as a free product and looks
-            # like a working price; a blank cell is visibly unfinished.
-            "Variant Price": f"{p['price']:.2f}" if p["price"] else "",
-            "Variant Compare At Price": f"{p['was']:.2f}" if p["was"] else "",
-            "Variant Requires Shipping": "TRUE",
-            "Variant Taxable": "TRUE",
-            "Image Src": image_url(p, 0) if p["images"] else "",
-            "Image Position": "1" if p["images"] else "",
-            "Image Alt Text": p["name"],
-            "SEO Title": f"{p['name']} | Free US Shipping Before Halloween"[:70],
-            "SEO Description": p["blurb"][:320],
-            "Product Metafield: reviews.rating [rating]": rating,
-            "Product Metafield: reviews.rating_count [number_integer]":
-                str(p["reviews"]) if p.get("reviews") else "",
-            "Product Metafield: custom.sold_count [number_integer]":
-                str(p["sold"]) if p.get("sold") else "",
-        },
-    )]
+    tags = p["cat"] + (", unavailable-at-supplier" if gone else "") \
+                    + (", needs-price" if unpriced and not gone else "") \
+                    + (", needs-size" if p["slug"] in NEEDS_SIZE else "")
+
+    rows = []
+    for n, chosen in enumerate(combos(opts)):
+        # Only the FIRST row of a handle carries the product itself. Repeat the
+        # title or the body on a later row and Shopify does not merge them, it
+        # overwrites - the last row wins and the earlier ones are lost.
+        first = n == 0
+        sku = "-".join([p["slug"]] + [
+            "".join(ch for ch in v if ch.isalnum()).upper()
+            for v in chosen if v != "Default Title"])
+        vimg = ""
+        for (oname, _vals), v in zip(opts, chosen):
+            f = vimgs.get((oname, v))
+            if f:
+                vimg = f"{IMG_BASE}/{f}"
+                break
+        r = row(
+            Handle=p["slug"],
+            Title=p["name"] if first else "",
+            Vendor="",
+            Type=p["cat"] if first else "",
+            Tags=tags if first else "",
+            Published=("FALSE" if gone or unpriced else "TRUE") if first else "",
+            Status=("draft" if gone or unpriced else "active") if first else "",
+            **{
+                "Body (HTML)": body_html(p) if first else "",
+                "Variant SKU": sku[:64],
+                "Variant Inventory Tracker": "shopify",
+                "Variant Inventory Qty": 25,
+                "Variant Inventory Policy": "deny",
+                "Variant Fulfillment Service": "manual",
+                # Blank, not 0.00. A zero here imports as a free product and
+                # looks like a working price; a blank cell is visibly
+                # unfinished. See the note in the docstring - the spreadsheet
+                # is not where that protection belongs, which is why the
+                # unpriced products are drafted above as well.
+                "Variant Price": f"{p['price']:.2f}" if p["price"] else "",
+                "Variant Compare At Price": f"{p['was']:.2f}" if p["was"] else "",
+                "Variant Requires Shipping": "TRUE",
+                "Variant Taxable": "TRUE",
+                "Image Src": (image_url(p, 0) if p["images"] else "") if first else "",
+                "Image Position": ("1" if p["images"] else "") if first else "",
+                "Image Alt Text": p["name"] if first else "",
+                "Variant Image": vimg,
+                "SEO Title": f"{p['name']} | Free US Shipping Before Halloween"[:70] if first else "",
+                "SEO Description": p["blurb"][:320] if first else "",
+                "Product Metafield: reviews.rating [rating]": rating if first else "",
+                "Product Metafield: reviews.rating_count [number_integer]":
+                    (str(p["reviews"]) if p.get("reviews") else "") if first else "",
+                "Product Metafield: custom.sold_count [number_integer]":
+                    (str(p["sold"]) if p.get("sold") else "") if first else "",
+            },
+        )
+        for i, (oname, _vals) in enumerate(opts, start=1):
+            # The option NAME repeats on every row of the handle. Shopify reads
+            # the name from whichever row it is on; leaving it off the later
+            # rows is how you get a second option column called "" .
+            r[f"Option{i} Name"] = oname
+            r[f"Option{i} Value"] = chosen[i - 1]
+        rows.append(r)
+
     for i in range(1, len(p["images"])):
         rows.append(row(Handle=p["slug"], **{
             "Image Src": image_url(p, i),
@@ -190,14 +290,29 @@ def main():
     unpriced = [p["slug"] for p in catalog.PRODUCTS if not p["price"]]
     nophoto = [p["slug"] for p in catalog.PRODUCTS if not p["images"]]
     live = [r for r in rows if r["Title"] and r["Published"] == "TRUE"]
+    live_handles = {r["Handle"] for r in live}
+    variant_rows = [r for r in rows if r["Option1 Value"]]
     print(f"products-import.csv: {len(catalog.PRODUCTS)} products, {len(rows)} rows")
 
     # The number that actually matters to him is how many appear on the
     # storefront, and the ONLY way a $0.00 product reaches it is a bug here.
     # Assert it rather than print it.
-    free = [r for r in live if not r["Variant Price"]]
-    assert not free, f"{len(free)} published products have no price: {free}"
-    print(f"  {len(live)} go live and can be bought")
+    #
+    # This now checks every VARIANT row of a published handle, not just the
+    # first row of each product. Variants made that distinction matter: the
+    # published flag is only written on row one, so a filter on Published alone
+    # sees one row of a twenty-five-row cardigan and calls the product checked.
+    free = [r for r in variant_rows
+            if r["Handle"] in live_handles and not r["Variant Price"]]
+    assert not free, f"{len(free)} buyable variants have no price: {free[:3]}"
+
+    # Same reasoning for the options themselves. An empty option value on a row
+    # that has an option name imports as a variant called "" - orderable, and
+    # impossible to pack.
+    blank = [r for r in variant_rows if r["Option1 Name"] and not r["Option1 Value"]]
+    assert not blank, f"{len(blank)} rows carry an option name with no value"
+
+    print(f"  {len(live)} products go live and can be bought")
     print(f"  {len(rows_drafted(rows, 'unavailable-at-supplier'))} draft - delisted at the supplier")
     print(f"  {len(rows_drafted(rows, 'needs-price'))} draft - waiting on a price from the client")
     print(f"  ({len(unpriced)} unpriced in total)")
@@ -205,6 +320,18 @@ def main():
     print(f"  {len(nophoto)} with no photo: {nophoto}")
     print(f"  {len(rated)} carrying a real supplier rating "
           f"({sum(p.get('reviews') or 0 for p in rated):,} reviews in total)")
+
+    print(f"\n  variants: {len(variant_rows)} across {len(catalog.PRODUCTS)} products "
+          f"({len(VARIANTS)} products have real options, "
+          f"{len(catalog.PRODUCTS) - len(VARIANTS)} are single-variant)")
+    for h, spec in VARIANTS.items():
+        n = len(combos(spec["options"]))
+        shape = " x ".join(f"{len(v)} {name}" for name, v in spec["options"])
+        pub = "live " if h in live_handles else "draft"
+        print(f"    {pub} {h:30} {n:3} variants  ({shape})")
+    sized = sorted(NEEDS_SIZE)
+    print(f"  {len(sized)} tagged needs-size - real colours, no size list in the "
+          f"supplier's photos: {sized}")
 
 
 if __name__ == "__main__":
