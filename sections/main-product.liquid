@@ -45,6 +45,37 @@
     endif
   endif
 -%}
+{%- comment -%}
+  Tag fallback. The metafield is preferred - a reviews app installed later
+  writes to it - but on this store the importer wrote no metafields at all and
+  all 22 products rendered an empty rating row. `rating:4.7`, `reviews:1234`
+  and `sold:2100` are ordinary tags and always import.
+  `times: 1` turns the captured STRING into a number; without it `rating_count
+  > 0` compares a string to an integer, which Liquid answers false in silence.
+{%- endcomment -%}
+{%- comment -%}
+  `> 0`, not `!= blank`. `times: 1` on a tag that is not a number returns 0
+  rather than failing, so a typo like `rating:abc` would set the rating to 0 -
+  which is not blank, so the row would render and the card would advertise
+  nought out of five stars. A tag that does not parse must be IGNORED, not
+  believed.
+{%- endcomment -%}
+{%- if rating == blank -%}
+  {%- capture t_rating -%}{% render 'tagval', tags: product.tags, key: 'rating' %}{%- endcapture -%}
+  {%- assign n_rating = t_rating | times: 1 -%}
+  {%- if n_rating > 0 -%}{%- assign rating = n_rating -%}{%- endif -%}
+{%- endif -%}
+{%- if rating_count == 0 -%}
+  {%- capture t_count -%}{% render 'tagval', tags: product.tags, key: 'reviews' %}{%- endcapture -%}
+  {%- assign n_count = t_count | times: 1 -%}
+  {%- if n_count > 0 -%}{%- assign rating_count = n_count -%}{%- endif -%}
+{%- endif -%}
+{%- if sold == blank -%}
+  {%- capture t_sold -%}{% render 'tagval', tags: product.tags, key: 'sold' %}{%- endcapture -%}
+  {%- assign n_sold = t_sold | times: 1 -%}
+  {%- if n_sold > 0 -%}{%- assign sold = n_sold -%}{%- endif -%}
+{%- endif -%}
+
 
 {%- comment -%}
   If the description already HAS a list, use its items. Sentence-splitting a

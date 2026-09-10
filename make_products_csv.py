@@ -229,6 +229,25 @@ def product_rows(p):
                     + (", needs-price" if unpriced and not gone else "") \
                     + (", needs-size" if p["slug"] in NEEDS_SIZE else "")
 
+    # The rating, review count and sold figure ALSO go out as tags.
+    #
+    # They are written as metafields above, which is where they belong - a
+    # reviews app installed later takes those exact fields over. But on the
+    # live store not one of the 22 products was showing a rating: every card
+    # rendered the empty placeholder row, because the importer had written no
+    # metafield at all. Tags always import, with no definition to set up first,
+    # so the numbers travel both ways and the theme prefers the metafield.
+    #
+    # Only real numbers are written. A product the supplier published no rating
+    # for gets no tag, and its rating row stays empty - the same rule as
+    # everywhere else here: an absent number is never filled in with a guess.
+    if p.get("rating"):
+        tags += f", rating:{p['rating']:.1f}"
+    if p.get("reviews"):
+        tags += f", reviews:{int(p['reviews'])}"
+    if p.get("sold"):
+        tags += f", sold:{int(p['sold'])}"
+
     rows = []
     for n, chosen in enumerate(combos(opts)):
         # Only the FIRST row of a handle carries the product itself. Repeat the

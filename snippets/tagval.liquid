@@ -1,0 +1,29 @@
+{%- comment -%}
+  Read a numeric value out of a product tag: `rating:4.7` -> 4.7
+
+    {%- capture r -%}{% render 'tagval', tags: product.tags, key: 'rating' %}{%- endcapture -%}
+
+  WHY TAGS. The ratings, review counts and sold figures are written as
+  metafields by the product importer, which is the right home for them - a
+  reviews app installed later takes the same fields over instead of fighting
+  them. But on this store not one of the 22 live products was showing a rating:
+  every card rendered the empty `card__rating--none` row, because Shopify's CSV
+  importer had written no metafield at all.
+
+  Tags always import. So the numbers now travel BOTH ways and the theme prefers
+  the metafield, falling back to the tag. Nothing is invented either way - if
+  both are missing the row still renders empty, exactly as before.
+
+  Outputs nothing at all when the tag is absent, so the caller's `!= blank`
+  test behaves.
+{%- endcomment -%}
+{%- liquid
+  assign want = key | append: ':'
+  for t in tags
+    if t contains want
+      assign v = t | remove_first: want | strip
+      echo v
+      break
+    endif
+  endfor
+-%}
