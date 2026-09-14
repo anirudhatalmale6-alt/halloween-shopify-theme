@@ -57,7 +57,7 @@ def load_variants():
         handle = (r.get("handle") or "").strip()
         if not handle:
             continue
-        opts, imgs, prices = [], {}, {}
+        opts, imgs, prices, compares = [], {}, {}, {}
         for n in ("1", "2", "3"):
             name = (r.get(f"option{n}_name") or "").strip()
             vals = [v.strip() for v in (r.get(f"option{n}_values") or "").split("|") if v.strip()]
@@ -89,6 +89,21 @@ def load_variants():
                 except ValueError:
                     sys.exit(f"variants.csv: {handle} option{n}_prices slot "
                              f"{i + 1} ({v}) is {raw[i]!r}, which is not a price")
+
+            # A bundle usually needs its OWN crossed-out price rather than one
+            # scaled from the single item's. "4 for $39.99, down from $59.99"
+            # is a comparison against buying two 2-packs - a number the
+            # generator has no way to work out, so it is stated.
+            rawc = [v.strip().lstrip("$").replace(",", "")
+                    for v in (r.get(f"option{n}_compares") or "").split("|")]
+            for i, v in enumerate(vals):
+                if i >= len(rawc) or not rawc[i]:
+                    continue
+                try:
+                    compares[(name, v)] = float(rawc[i])
+                except ValueError:
+                    sys.exit(f"variants.csv: {handle} option{n}_compares slot "
+                             f"{i + 1} ({v}) is {rawc[i]!r}, which is not a price")
         if opts:
             # More than one priced option would mean two axes both moving the
             # price, and nothing here decides whether they add or multiply.
@@ -98,6 +113,7 @@ def load_variants():
                 sys.exit(f"variants.csv: {handle} sets prices on {sorted(axes)}. "
                          f"Only one option may carry prices.")
             out[handle] = {"options": opts, "images": imgs, "prices": prices,
+                           "compares": compares,
                            "evidence": (r.get("evidence") or "").strip()}
     return out
 
@@ -218,6 +234,7 @@ def product_rows(p):
     opts = spec["options"] if spec else [("Title", ["Default Title"])]
     vimgs = spec["images"] if spec else {}
     vprices = spec.get("prices", {}) if spec else {}
+    vcompares = spec.get("compares", {}) if spec else {}
     # A rating is only written when the supplier published one. No fallback,
     # no default - a product with no reviews imports with an empty metafield
     # and the theme then renders no stars at all for it.
@@ -275,6 +292,12 @@ def product_rows(p):
                 if vprice and vwas:
                     vwas = round(vwas * over / vprice, 2)
                 vprice = over
+            # Stated beats scaled. A product with no compare-at at all has
+            # nothing to scale, so without this a bundle could never show a
+            # discount - which is the entire point of offering one.
+            if (oname, v) in vcompares:
+                vwas = vcompares[(oname, v)]
+            if (oname, v) in vprices or (oname, v) in vcompares:
                 break
         r = row(
             Handle=p["slug"],

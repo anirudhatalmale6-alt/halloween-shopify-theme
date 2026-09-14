@@ -405,13 +405,34 @@
       });
     }
 
+    /* The crossed-out price, the "Save N%" badge on the photo and the
+       "You save $X" chip all belong to the CHOSEN variant, not to the product.
+       A bundle can be discounted while the single item is not - 4 covers at
+       $39.99 down from $59.99, 2 at a flat $29.99 - so all three have to be
+       recomputed on every switch. Showing a saving that does not apply to what
+       is about to be added to the cart is a false price claim, not a cosmetic
+       bug, so the OFF branch matters more than the ON branch. */
+    var onSale = v.compare_at_price && v.compare_at_price > v.price;
     if (wasEl) {
-      if (v.compare_at_price && v.compare_at_price > v.price) {
-        wasEl.textContent = money(v.compare_at_price);
-        wasEl.style.display = '';
-      } else {
-        wasEl.style.display = 'none';
+      if (onSale) { wasEl.textContent = money(v.compare_at_price); }
+      wasEl.style.display = onSale ? '' : 'none';
+    }
+    var offEl = $('#poff');
+    if (offEl) {
+      if (onSale) {
+        /* floor, not round: 49.99 off 79.99 is 37.5%, and rounding up prints a
+           discount slightly larger than the one actually offered. */
+        offEl.textContent = 'Save ' + Math.floor(
+          (v.compare_at_price - v.price) * 100 / v.compare_at_price) + '%';
       }
+      offEl.style.display = onSale ? '' : 'none';
+    }
+    var saveEl = $('#psave');
+    if (saveEl) {
+      if (onSale) {
+        saveEl.textContent = 'You save ' + money(v.compare_at_price - v.price);
+      }
+      saveEl.style.display = onSale ? '' : 'none';
     }
 
     /* The wording is read from data-add, not hardcoded. "Add to Cart" is a

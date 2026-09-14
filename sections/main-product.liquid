@@ -114,8 +114,18 @@
     {%- comment -%} ---------------- gallery ---------------- {%- endcomment -%}
     <div class="pdp__gal">
       <div class="pdp__stage" id="stage">
-        {%- if on_sale and section.settings.show_save -%}
-          <span class="pdp__off">Save {{ save_pct }}%</span>
+        {%- comment -%}
+          Always rendered, hidden when this variant is not discounted. It used
+          to be omitted entirely, which meant a product whose FIRST variant has
+          no compare-at price had no badge in the DOM at all - so switching to
+          a variant that IS discounted could never show one. The reverse is
+          worse: a badge left in place after switching to an undiscounted
+          variant advertises a saving that does not apply to what is in the
+          cart. theme.js sets both on every variant change.
+        {%- endcomment -%}
+        {%- if section.settings.show_save -%}
+          <span class="pdp__off" id="poff"
+                {% unless on_sale %}style="display:none"{% endunless %}>Save {{ save_pct | default: 0 }}%</span>
         {%- endif -%}
 
         {%- if product.featured_media -%}
@@ -183,10 +193,10 @@
 
       <div class="pdp__price">
         <span class="price" id="pprice">{{ v.price | money }}</span>
-        {%- if on_sale -%}
+        
           <span class="was" id="pwas">{{ v.compare_at_price | money }}</span>
-          <span class="pdp__save">You save {{ save_amt | money }}</span>
-        {%- endif -%}
+          <span class="pdp__save" id="psave"{% unless on_sale %} style="display:none"{% endunless %}>You save {{ save_amt | money }}</span>
+        
       </div>
 
       {%- if bullets != blank -%}
